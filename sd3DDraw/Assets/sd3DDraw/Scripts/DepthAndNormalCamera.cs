@@ -33,6 +33,7 @@ namespace SD3DDraw
 
             RenderTexture.active = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height);
 
+            // Depth
             Graphics.Blit(CaptureCamera.targetTexture, RenderTexture.active, getDepthMaterial_);
 
             targetTexture2D_.ReadPixels(new Rect(0, 0, CaptureCamera.targetTexture.width, CaptureCamera.targetTexture.height), 0, 0);
@@ -41,6 +42,7 @@ namespace SD3DDraw
             byte[] bytes = targetTexture2D_.EncodeToPNG();
             File.WriteAllBytes(@"depth.png", bytes);
 
+            // Normal
             Graphics.Blit(CaptureCamera.targetTexture, RenderTexture.active, getNormalMaterial_);
 
             targetTexture2D_.ReadPixels(new Rect(0, 0, CaptureCamera.targetTexture.width, CaptureCamera.targetTexture.height), 0, 0);
@@ -48,6 +50,15 @@ namespace SD3DDraw
 
             bytes = targetTexture2D_.EncodeToPNG();
             File.WriteAllBytes(@"normal.png", bytes);
+
+            // Image
+            Graphics.Blit(CaptureCamera.targetTexture, RenderTexture.active);
+
+            targetTexture2D_.ReadPixels(new Rect(0, 0, CaptureCamera.targetTexture.width, CaptureCamera.targetTexture.height), 0, 0);
+            targetTexture2D_.Apply();
+
+            bytes = targetTexture2D_.EncodeToPNG();
+            File.WriteAllBytes(@"image.png", bytes);
 
             RenderTexture.ReleaseTemporary(RenderTexture.active);
         }
