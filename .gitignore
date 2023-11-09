@@ -1,0 +1,7 @@
+.DS_Store
+/sd3DDraw/Library/
+/sd3DDraw/Logs/
+/sd3DDraw/obj/
+/sd3DDraw/.vs/
+/sd3DDraw/Temp/
+/sd3DDraw/*.csproj
