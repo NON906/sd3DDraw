@@ -45,7 +45,7 @@ namespace SD3DDraw
             sdManager_.CaptureCamera.cullingMask = 1 << LayerMask.NameToLayer("SDTarget");
 
             var defaultLayers = new List<int>();
-            var renderers = FindObjectsOfType<Renderer>();
+            var renderers = GetComponentsInChildren<Renderer>();
             for (int loop = 0; loop < renderers.Length; loop++)
             {
                 defaultLayers.Add(renderers[loop].gameObject.layer);
