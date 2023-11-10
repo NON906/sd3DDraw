@@ -35,6 +35,7 @@ namespace SD3DDraw
         List<DrawTargetWithDistance> drawTargets_ = new List<DrawTargetWithDistance>();
         RenderTexture depthAllTexture_;
         Material getDepthMaterial_;
+        Material overlayMaterial_;
 
         void Start()
         {
@@ -43,6 +44,7 @@ namespace SD3DDraw
             targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
             depthAllTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0);
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
+            overlayMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/Overlay"));
 
             Generate();
         }
@@ -78,30 +80,35 @@ namespace SD3DDraw
 
             if (TargetBackGround != null)
             {
-                //yield return TargetBackGround.Generate();
+                yield return TargetBackGround.Generate();
             }
             foreach (var drawTarget in drawTargets_)
             {
                 yield return drawTarget.Target.Generate(depthAllTexture_);
             }
 
-            RenderTexture.active = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height);
+            var activeTexture = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
 
             if (TargetBackGround != null && TargetBackGround.GeneratedTexture != null)
             {
-                //Graphics.Blit(TargetBackGround.GeneratedTexture, RenderTexture.active);
+                Graphics.Blit(TargetBackGround.GeneratedTexture, activeTexture);
             }
+            var tempTex = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
             foreach (var drawTarget in drawTargets_)
             {
-                Graphics.Blit(drawTarget.Target.GeneratedTexture, RenderTexture.active);
+                Graphics.Blit(activeTexture, tempTex);
+                overlayMaterial_.SetTexture("_BaseTex", tempTex);
+                Graphics.Blit(drawTarget.Target.GeneratedTexture, activeTexture, overlayMaterial_);
             }
+            RenderTexture.ReleaseTemporary(tempTex);
 
+            RenderTexture.active = activeTexture;
             targetTexture2D_.ReadPixels(new Rect(0, 0, targetTexture2D_.width, targetTexture2D_.height), 0, 0);
             targetTexture2D_.Apply();
             byte[] bytes = targetTexture2D_.EncodeToPNG();
             File.WriteAllBytes(@"result.png", bytes);
 
-            RenderTexture.ReleaseTemporary(RenderTexture.active);
+            RenderTexture.ReleaseTemporary(activeTexture);
 
             Time.timeScale = defaultTimeScale;
 
