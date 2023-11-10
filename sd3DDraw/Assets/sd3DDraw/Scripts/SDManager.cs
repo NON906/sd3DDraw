@@ -40,11 +40,6 @@ namespace SD3DDraw
 
         void Start()
         {
-            if (CaptureCamera.clearFlags == CameraClearFlags.Skybox)
-            {
-                CaptureCamera.clearFlags = CameraClearFlags.SolidColor;
-                CaptureCamera.backgroundColor = Color.clear;
-            }
             CaptureCamera.depthTextureMode = DepthTextureMode.DepthNormals;
             CaptureCamera.targetTexture = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
@@ -80,6 +75,12 @@ namespace SD3DDraw
 
             float defaultTimeScale = Time.timeScale;
             Time.timeScale = 0f;
+
+            if (TargetBackGround != null && CaptureCamera.clearFlags == CameraClearFlags.Skybox)
+            {
+                CaptureCamera.clearFlags = CameraClearFlags.SolidColor;
+                CaptureCamera.backgroundColor = Color.clear;
+            }
 
             yield return new WaitForEndOfFrame();
 
