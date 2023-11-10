@@ -123,6 +123,25 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &476902942 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 3247636921453298869, guid: c37f7e433b79af84684e5f71f9d12f64, type: 3}
+  m_PrefabInstance: {fileID: 1184617535}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &476902951
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 476902942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87462150a808e0e44b91fda258132021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Prompt: 1girl
+  NegativePrompt: 
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -698,6 +717,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e2f7e1fb29ed56c44a969a4a951e0772, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ApiUrl: http://127.0.0.1:7860
+  DefaultPrompt: super fine illustration
+  DefaultNegativePrompt: flat color, flat shading, nsfw, retro style, poor quality,
+    bad face, bad fingers, bad anatomy, missing fingers, low res, cropped, signature,
+    watermark, username, artist name, text, logo, logos
   CaptureSize: {x: 768, y: 512}
   CaptureCamera: {fileID: 1200245535}
 --- !u!1 &1733531246

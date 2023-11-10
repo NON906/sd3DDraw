@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace SD3DDraw
@@ -10,6 +11,12 @@ namespace SD3DDraw
         const string API_URL = "http://127.0.0.1:7860";
         const string DEFAULT_PROMPT = "super fine illustration";
         const string DEFAULT_NEGATIVE_PROMPT = "flat color, flat shading, nsfw, retro style, poor quality, bad face, bad fingers, bad anatomy, missing fingers, low res, cropped, signature, watermark, username, artist name, text, logo, logos";
+
+        class DrawTargetWithDistance
+        {
+            public float Distance;
+            public SDDrawTarget Target;
+        }
 
         public string ApiUrl = API_URL;
         public string DefaultPrompt = DEFAULT_PROMPT;
@@ -25,14 +32,28 @@ namespace SD3DDraw
 
         bool isGenerating_ = false;
         Texture2D targetTexture2D_;
+        List<DrawTargetWithDistance> drawTargets_ = new List<DrawTargetWithDistance>();
+        RenderTexture depthAllTexture_;
+        Material getDepthMaterial_;
 
         void Start()
         {
             CaptureCamera.depthTextureMode = DepthTextureMode.DepthNormals;
             CaptureCamera.targetTexture = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
+            depthAllTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0);
+            getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
 
             Generate();
+        }
+
+        public void AddDrawTarget(SDDrawTarget target)
+        {
+            var drawTarget = new DrawTargetWithDistance();
+            drawTarget.Distance = Vector3.Distance(target.transform.position, CaptureCamera.transform.position);
+            drawTarget.Target = target;
+            drawTargets_.Add(drawTarget);
+            drawTargets_ = drawTargets_.OrderByDescending(item => item.Distance).ToList();
         }
 
         public void Generate()
@@ -51,16 +72,28 @@ namespace SD3DDraw
             float defaultTimeScale = Time.timeScale;
             Time.timeScale = 0f;
 
+            yield return new WaitForEndOfFrame();
+
+            Graphics.Blit(CaptureCamera.targetTexture, depthAllTexture_, getDepthMaterial_);
+
             if (TargetBackGround != null)
             {
-                yield return TargetBackGround.Generate();
+                //yield return TargetBackGround.Generate();
+            }
+            foreach (var drawTarget in drawTargets_)
+            {
+                yield return drawTarget.Target.Generate(depthAllTexture_);
             }
 
             RenderTexture.active = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height);
 
             if (TargetBackGround != null && TargetBackGround.GeneratedTexture != null)
             {
-                Graphics.Blit(TargetBackGround.GeneratedTexture, RenderTexture.active);
+                //Graphics.Blit(TargetBackGround.GeneratedTexture, RenderTexture.active);
+            }
+            foreach (var drawTarget in drawTargets_)
+            {
+                Graphics.Blit(drawTarget.Target.GeneratedTexture, RenderTexture.active);
             }
 
             targetTexture2D_.ReadPixels(new Rect(0, 0, targetTexture2D_.width, targetTexture2D_.height), 0, 0);

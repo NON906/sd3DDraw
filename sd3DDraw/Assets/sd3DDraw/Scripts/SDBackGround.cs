@@ -8,7 +8,7 @@ using UnityEngine.Networking;
 namespace SD3DDraw
 {
     [Serializable]
-    public class Txt2ImgRequestScriptsArgs
+    public class Txt2ImgRequestScriptsControlNetArgs
     {
         public bool enabled = true;
         public string module = "none";
@@ -19,20 +19,20 @@ namespace SD3DDraw
         public bool lowvram = false;
         public float guidance_start = 0f;
         public float guidance_end = 1f;
-        public int control_mode = 1;
+        public int control_mode = 0;
         public bool pixel_perfect = false;
     }
 
     [Serializable]
     public class Txt2ImgRequestScriptsControlNet
     {
-        public Txt2ImgRequestScriptsArgs[] args;
+        public Txt2ImgRequestScriptsControlNetArgs[] args;
     }
 
     [Serializable]
     public class Txt2ImgRequestScripts
     {
-        public Txt2ImgRequestScriptsControlNet controlnet = new Txt2ImgRequestScriptsControlNet();
+        public Txt2ImgRequestScriptsControlNet controlnet = null;
     }
 
     [Serializable]
