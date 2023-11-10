@@ -12,8 +12,8 @@ namespace SD3DDraw
 {
     public class SDDrawTarget : MonoBehaviour
     {
-        const string ADD_PROMPT = "simple background, no background, solid color background";
-        const int SHRINK_PIXELS = 2;
+        const string ADD_PROMPT = "simple background";
+        const int SHRINK_PIXELS = 1;
 
         [TextArea(1, 10)]
         public string Prompt = "";
@@ -34,6 +34,8 @@ namespace SD3DDraw
         Material maskMaterial_;
         Texture2D sdOutputTexture_;
         RunModel runModel_;
+        Renderer[] renderers_ = null;
+        List<int> defaultLayers_ = null;
 
         void Awake()
         {
@@ -51,18 +53,43 @@ namespace SD3DDraw
             runModel_ = FindObjectOfType<RunModel>();
         }
 
+        public void Hide()
+        {
+            if (renderers_ != null || defaultLayers_ != null)
+            {
+                return;
+            }
+
+            defaultLayers_ = new List<int>();
+            renderers_ = GetComponentsInChildren<Renderer>();
+            for (int loop = 0; loop < renderers_.Length; loop++)
+            {
+                defaultLayers_.Add(renderers_[loop].gameObject.layer);
+                renderers_[loop].gameObject.layer = LayerMask.NameToLayer("SDTarget");
+            }
+        }
+
+        public void Show()
+        {
+            if (renderers_ == null || defaultLayers_ == null)
+            {
+                return;
+            }
+
+            for (int loop = renderers_.Length - 1; loop >= 0; loop--)
+            {
+                renderers_[loop].gameObject.layer = defaultLayers_[loop];
+            }
+            renderers_ = null;
+            defaultLayers_ = null;
+        }
+
         public IEnumerator Generate(RenderTexture depthAllTexture)
         {
             var defaultMask = sdManager_.CaptureCamera.cullingMask;
             sdManager_.CaptureCamera.cullingMask = 1 << LayerMask.NameToLayer("SDTarget");
 
-            var defaultLayers = new List<int>();
-            var renderers = GetComponentsInChildren<Renderer>();
-            for (int loop = 0; loop < renderers.Length; loop++)
-            {
-                defaultLayers.Add(renderers[loop].gameObject.layer);
-                renderers[loop].gameObject.layer = LayerMask.NameToLayer("SDTarget");
-            }
+            Hide();
 
             sdManager_.CaptureCamera.Render();
 
@@ -82,10 +109,7 @@ namespace SD3DDraw
 
             RenderTexture.ReleaseTemporary(RenderTexture.active);
 
-            for (int loop = 0; loop < renderers.Length; loop++)
-            {
-                renderers[loop].gameObject.layer = defaultLayers[loop];
-            }
+            Show();
 
             sdManager_.CaptureCamera.cullingMask = defaultMask;
 

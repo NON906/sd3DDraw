@@ -34,6 +34,7 @@ namespace SD3DDraw
         Texture2D targetTexture2D_;
         List<DrawTargetWithDistance> drawTargets_ = new List<DrawTargetWithDistance>();
         RenderTexture depthAllTexture_;
+        RenderTexture otherTexture_;
         Material getDepthMaterial_;
         Material overlayMaterial_;
 
@@ -48,6 +49,7 @@ namespace SD3DDraw
             CaptureCamera.targetTexture = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
             depthAllTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0);
+            otherTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             overlayMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/Overlay"));
 
@@ -82,6 +84,19 @@ namespace SD3DDraw
             yield return new WaitForEndOfFrame();
 
             Graphics.Blit(CaptureCamera.targetTexture, depthAllTexture_, getDepthMaterial_);
+            foreach (var drawTarget in drawTargets_)
+            {
+                drawTarget.Target.Hide();
+            }
+            var defaultMask = CaptureCamera.cullingMask;
+            CaptureCamera.cullingMask = ~(1 << LayerMask.NameToLayer("SDTarget"));
+            CaptureCamera.Render();
+            CaptureCamera.cullingMask = defaultMask;
+            Graphics.Blit(CaptureCamera.targetTexture, otherTexture_);
+            foreach (var drawTarget in drawTargets_)
+            {
+                drawTarget.Target.Show();
+            }
 
             if (TargetBackGround != null)
             {
@@ -99,11 +114,11 @@ namespace SD3DDraw
             {
                 Graphics.Blit(TargetBackGround.GeneratedTexture, tempTex);
                 overlayMaterial_.SetTexture("_BaseTex", tempTex);
-                Graphics.Blit(CaptureCamera.targetTexture, activeTexture, overlayMaterial_);
+                Graphics.Blit(otherTexture_, activeTexture, overlayMaterial_);
             }
             else
             {
-                Graphics.Blit(CaptureCamera.targetTexture, activeTexture);
+                Graphics.Blit(otherTexture_, activeTexture);
             }
             foreach (var drawTarget in drawTargets_)
             {
