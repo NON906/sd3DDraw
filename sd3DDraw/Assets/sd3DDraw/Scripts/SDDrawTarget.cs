@@ -1,3 +1,4 @@
+using RemoveBackground;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -10,6 +11,8 @@ namespace SD3DDraw
 {
     public class SDDrawTarget : MonoBehaviour
     {
+        const string ADD_PROMPT = "simple background, no background, solid color background";
+
         [TextArea(1, 10)]
         public string Prompt = "";
         [TextArea(1, 10)]
@@ -26,6 +29,9 @@ namespace SD3DDraw
         Texture2D depthTexture_;
         Material getNormalMaterial_;
         Texture2D normalTexture_;
+        Material maskMaterial_;
+        Texture2D sdOutputTexture_;
+        RunModel runModel_;
 
         void Awake()
         {
@@ -37,6 +43,10 @@ namespace SD3DDraw
             depthTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             normalTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+            maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
+            sdOutputTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+
+            runModel_ = FindObjectOfType<RunModel>();
         }
 
         public IEnumerator Generate(RenderTexture depthAllTexture)
@@ -78,7 +88,7 @@ namespace SD3DDraw
             sdManager_.CaptureCamera.cullingMask = defaultMask;
 
             var request = new Txt2ImgRequest();
-            request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
+            request.prompt = sdManager_.DefaultPrompt + ", " + ADD_PROMPT + ", " + Prompt;
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
             request.width = GeneratedTexture.width;
             request.height = GeneratedTexture.height;
@@ -123,7 +133,19 @@ namespace SD3DDraw
 
             string baseImageOnBase64 = response.images[0];
             byte[] baseImage = Convert.FromBase64String(response.images[0]);
-            GeneratedTexture.LoadImage(baseImage);
+            sdOutputTexture_.LoadImage(baseImage);
+
+            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+
+            var maskTexture = runModel_.Execute(sdOutputTexture_);
+            maskMaterial_.SetTexture("_AllTex", depthAllTexture);
+            maskMaterial_.SetTexture("_TargetTex", depthTexture_);
+            maskMaterial_.SetTexture("_MaskTex", maskTexture);
+            Graphics.Blit(sdOutputTexture_, RenderTexture.active, maskMaterial_);
+            GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
+            GeneratedTexture.Apply();
+
+            RenderTexture.ReleaseTemporary(RenderTexture.active);
         }
     }
 }
