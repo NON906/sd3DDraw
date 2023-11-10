@@ -19,6 +19,13 @@ namespace SD3DDraw
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
+        public int Seed = -1;
+        [Range(0f, 2f)]
+        public float DepthWeight = 1f;
+        [Range(0f, 2f)]
+        public float NormalWeight = 1f;
+        [Range(0f, 2f)]
+        public float LineartWeight = 0f;
 
         public Texture2D GeneratedTexture
         {
@@ -32,6 +39,7 @@ namespace SD3DDraw
         Material getNormalMaterial_;
         Texture2D normalTexture_;
         Material maskMaterial_;
+        Texture2D imageTexture_;
         Texture2D sdOutputTexture_;
         RunModel runModel_;
         Renderer[] renderers_ = null;
@@ -48,6 +56,7 @@ namespace SD3DDraw
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             normalTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
+            imageTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             sdOutputTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
 
             runModel_ = FindObjectOfType<RunModel>();
@@ -107,6 +116,15 @@ namespace SD3DDraw
             //bytes = normalTexture_.EncodeToPNG();
             //File.WriteAllBytes(@"normal.png", bytes);
 
+            if (LineartWeight > 0.001f)
+            {
+                Graphics.Blit(sdManager_.CaptureCamera.targetTexture, RenderTexture.active);
+                imageTexture_.ReadPixels(new Rect(0, 0, sdManager_.CaptureCamera.targetTexture.width, sdManager_.CaptureCamera.targetTexture.height), 0, 0);
+                imageTexture_.Apply();
+                //bytes = imageTexture_.EncodeToPNG();
+                //File.WriteAllBytes(@"image.png", bytes);
+            }
+
             RenderTexture.ReleaseTemporary(RenderTexture.active);
 
             Show();
@@ -116,22 +134,34 @@ namespace SD3DDraw
             var request = new Txt2ImgRequest();
             request.prompt = sdManager_.DefaultPrompt + ", " + ADD_PROMPT + ", " + Prompt;
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
+            request.seed = Seed;
             request.width = GeneratedTexture.width;
             request.height = GeneratedTexture.height;
             request.alwayson_scripts = new Txt2ImgRequestScripts();
             request.alwayson_scripts.controlnet = new Txt2ImgRequestScriptsControlNet();
 
             List<Txt2ImgRequestScriptsControlNetArgs> args = new List<Txt2ImgRequestScriptsControlNetArgs>();
+            if (DepthWeight > 0.001f)
             {
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "depth";
                 arg.image = Convert.ToBase64String(depthTexture_.EncodeToPNG());
                 args.Add(arg);
             }
+            if (NormalWeight > 0.001f)
             {
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "normalbae";
                 arg.image = Convert.ToBase64String(normalTexture_.EncodeToPNG());
+                args.Add(arg);
+            }
+            if (LineartWeight > 0.001f)
+            {
+                var arg = new Txt2ImgRequestScriptsControlNetArgs();
+                arg.module = "lineart_anime";
+                arg.model = "lineart_anime";
+                arg.image = Convert.ToBase64String(imageTexture_.EncodeToPNG());
+                arg.processor_res = 512;
                 args.Add(arg);
             }
             request.alwayson_scripts.controlnet.args = args.ToArray();

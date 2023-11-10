@@ -21,6 +21,7 @@ namespace SD3DDraw
         public float guidance_end = 1f;
         public int control_mode = 0;
         public bool pixel_perfect = false;
+        public int processor_res = -1;
     }
 
     [Serializable]
@@ -41,6 +42,7 @@ namespace SD3DDraw
         public string prompt;
         public string negative_prompt;
         public string[] styles = new string[0];
+        public int seed = -1;
         public int steps = 20;
         public int cfg_scale = 7;
         public int width;
@@ -63,6 +65,7 @@ namespace SD3DDraw
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
+        public int Seed = -1;
 
         public Texture2D GeneratedTexture
         {
@@ -85,6 +88,7 @@ namespace SD3DDraw
             var request = new Txt2ImgRequest();
             request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
+            request.seed = Seed;
             request.width = GeneratedTexture.width;
             request.height = GeneratedTexture.height;
 

@@ -142,6 +142,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prompt: 1girl
   NegativePrompt: 
+  Seed: -1
+  DepthWeight: 1
+  NormalWeight: 1
+  LineartWeight: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -769,6 +773,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prompt: forest
   NegativePrompt: 
+  Seed: -1
 --- !u!4 &1733531248
 Transform:
   m_ObjectHideFlags: 0
