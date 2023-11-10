@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -12,6 +13,7 @@ namespace SD3DDraw
     public class SDDrawTarget : MonoBehaviour
     {
         const string ADD_PROMPT = "simple background, no background, solid color background";
+        const int SHRINK_PIXELS = 2;
 
         [TextArea(1, 10)]
         public string Prompt = "";
@@ -143,6 +145,46 @@ namespace SD3DDraw
             maskMaterial_.SetTexture("_MaskTex", maskTexture);
             Graphics.Blit(sdOutputTexture_, RenderTexture.active, maskMaterial_);
             GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
+
+            var pixels = GeneratedTexture.GetPixels32();
+            for (int loop = 0; loop < SHRINK_PIXELS; loop++)
+            {
+                var newPixels = pixels.ToArray();
+                for (int x = 1; x < GeneratedTexture.width - 1; x++)
+                {
+                    for (int y = 1; y < GeneratedTexture.height - 1; y++)
+                    {
+                        if (pixels[x + y * GeneratedTexture.width].a <= 0)
+                        {
+                            newPixels[(x + 1) + y * GeneratedTexture.width].a = 0;
+                            newPixels[(x - 1) + y * GeneratedTexture.width].a = 0;
+                            newPixels[x + (y + 1) * GeneratedTexture.width].a = 0;
+                            newPixels[x + (y - 1) * GeneratedTexture.width].a = 0;
+                        }
+                    }
+                }
+                pixels = newPixels;
+            }
+            for (int loop = 0; loop < SHRINK_PIXELS; loop++)
+            {
+                var newPixels = pixels.ToArray();
+                for (int x = 1; x < GeneratedTexture.width - 1; x++)
+                {
+                    for (int y = 1; y < GeneratedTexture.height - 1; y++)
+                    {
+                        if (pixels[x + y * GeneratedTexture.width].a >= 255)
+                        {
+                            newPixels[(x + 1) + y * GeneratedTexture.width].a = 255;
+                            newPixels[(x - 1) + y * GeneratedTexture.width].a = 255;
+                            newPixels[x + (y + 1) * GeneratedTexture.width].a = 255;
+                            newPixels[x + (y - 1) * GeneratedTexture.width].a = 255;
+                        }
+                    }
+                }
+                pixels = newPixels;
+            }
+            GeneratedTexture.SetPixels32(pixels);
+
             GeneratedTexture.Apply();
 
             RenderTexture.ReleaseTemporary(RenderTexture.active);
