@@ -39,6 +39,11 @@ namespace SD3DDraw
 
         void Start()
         {
+            if (CaptureCamera.clearFlags == CameraClearFlags.Skybox)
+            {
+                CaptureCamera.clearFlags = CameraClearFlags.SolidColor;
+                CaptureCamera.backgroundColor = Color.clear;
+            }
             CaptureCamera.depthTextureMode = DepthTextureMode.DepthNormals;
             CaptureCamera.targetTexture = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
@@ -88,18 +93,25 @@ namespace SD3DDraw
             }
 
             var activeTexture = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
+            var tempTex = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
 
             if (TargetBackGround != null && TargetBackGround.GeneratedTexture != null)
             {
-                Graphics.Blit(TargetBackGround.GeneratedTexture, activeTexture);
+                Graphics.Blit(TargetBackGround.GeneratedTexture, tempTex);
+                overlayMaterial_.SetTexture("_BaseTex", tempTex);
+                Graphics.Blit(CaptureCamera.targetTexture, activeTexture, overlayMaterial_);
             }
-            var tempTex = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
+            else
+            {
+                Graphics.Blit(CaptureCamera.targetTexture, activeTexture);
+            }
             foreach (var drawTarget in drawTargets_)
             {
                 Graphics.Blit(activeTexture, tempTex);
                 overlayMaterial_.SetTexture("_BaseTex", tempTex);
                 Graphics.Blit(drawTarget.Target.GeneratedTexture, activeTexture, overlayMaterial_);
             }
+
             RenderTexture.ReleaseTemporary(tempTex);
 
             RenderTexture.active = activeTexture;
