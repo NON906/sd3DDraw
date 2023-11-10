@@ -83,14 +83,14 @@ namespace SD3DDraw
         public IEnumerator Generate()
         {
             var request = new Txt2ImgRequest();
-            request.prompt = SDManager.DEFAULT_PROMPT + ", " + Prompt;
-            request.negative_prompt = SDManager.DEFAULT_NEGATIVE_PROMPT + ", " + NegativePrompt;
+            request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
+            request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
             request.width = GeneratedTexture.width;
             request.height = GeneratedTexture.height;
 
             var jsonRequest = JsonUtility.ToJson(request);
 
-            using var webRequest = new UnityWebRequest(SDManager.API_URL + "/sdapi/v1/txt2img", "POST")
+            using var webRequest = new UnityWebRequest(sdManager_.ApiUrl + "/sdapi/v1/txt2img", "POST")
             {
                 uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(jsonRequest)),
                 downloadHandler = new DownloadHandlerBuffer(),

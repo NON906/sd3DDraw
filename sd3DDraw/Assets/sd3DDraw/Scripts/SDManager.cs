@@ -7,10 +7,13 @@ namespace SD3DDraw
 {
     public class SDManager : MonoBehaviour
     {
-        public const string API_URL = "http://127.0.0.1:7860";
-        public const string DEFAULT_PROMPT = "super fine illustration";
-        public const string DEFAULT_NEGATIVE_PROMPT = "flat color, flat shading, nsfw, retro style, poor quality, bad face, bad fingers, bad anatomy, missing fingers, low res, cropped, signature, watermark, username, artist name, text, logo, logos";
+        const string API_URL = "http://127.0.0.1:7860";
+        const string DEFAULT_PROMPT = "super fine illustration";
+        const string DEFAULT_NEGATIVE_PROMPT = "flat color, flat shading, nsfw, retro style, poor quality, bad face, bad fingers, bad anatomy, missing fingers, low res, cropped, signature, watermark, username, artist name, text, logo, logos";
 
+        public string ApiUrl = API_URL;
+        public string DefaultPrompt = DEFAULT_PROMPT;
+        public string DefaultNegativePrompt = DEFAULT_NEGATIVE_PROMPT;
         public Vector2Int CaptureSize = new Vector2Int(768, 512);
         public Camera CaptureCamera;
 
