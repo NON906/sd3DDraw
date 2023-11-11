@@ -19,7 +19,9 @@ namespace SD3DDraw
         }
 
         public string ApiUrl = API_URL;
+        [TextArea(1, 10)]
         public string DefaultPrompt = DEFAULT_PROMPT;
+        [TextArea(1, 10)]
         public string DefaultNegativePrompt = DEFAULT_NEGATIVE_PROMPT;
         public Vector2Int CaptureSize = new Vector2Int(768, 512);
         public Camera CaptureCamera;
