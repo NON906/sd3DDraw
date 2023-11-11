@@ -729,6 +729,7 @@ MonoBehaviour:
     watermark, username, artist name, text, logo, logos
   CaptureSize: {x: 768, y: 512}
   CaptureCamera: {fileID: 1200245535}
+  GenerateOnStart: 0
 --- !u!114 &1200245538
 MonoBehaviour:
   m_ObjectHideFlags: 0

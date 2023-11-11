@@ -23,6 +23,7 @@ namespace SD3DDraw
         public string DefaultNegativePrompt = DEFAULT_NEGATIVE_PROMPT;
         public Vector2Int CaptureSize = new Vector2Int(768, 512);
         public Camera CaptureCamera;
+        public bool GenerateOnStart = false;
 
         public SDBackGround TargetBackGround
         {
@@ -31,6 +32,14 @@ namespace SD3DDraw
         } = null;
 
         bool isGenerating_ = false;
+        public bool IsGenerating
+        {
+            get
+            {
+                return isGenerating_;
+            }
+        }
+
         Texture2D targetTexture2D_;
         List<DrawTargetWithDistance> drawTargets_ = new List<DrawTargetWithDistance>();
         RenderTexture depthAllTexture_;
@@ -48,7 +57,10 @@ namespace SD3DDraw
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             overlayMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/Overlay"));
 
-            Generate();
+            if (GenerateOnStart)
+            {
+                Generate();
+            }
         }
 
         public void AddDrawTarget(SDDrawTarget target)
