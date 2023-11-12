@@ -15,6 +15,13 @@ namespace SD3DDraw
         const string ADD_PROMPT = "simple background";
         const int SHRINK_PIXELS = 1;
 
+        public enum ControlModeEnum
+        {
+            Balanced,
+            MyPrompt,
+            ControlNet,
+        }
+
         [TextArea(1, 10)]
         public string Prompt = "";
         [TextArea(1, 10)]
@@ -26,6 +33,7 @@ namespace SD3DDraw
         public float NormalWeight = 1f;
         [Range(0f, 2f)]
         public float LineartWeight = 0f;
+        public ControlModeEnum ControlMode = ControlModeEnum.Balanced;
         public bool ChangeMaterials = false;
         public bool DisableBackgroundMask = false;
 
@@ -168,6 +176,7 @@ namespace SD3DDraw
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "depth";
                 arg.image = Convert.ToBase64String(depthTexture_.EncodeToPNG());
+                arg.control_mode = (int)ControlMode;
                 args.Add(arg);
             }
             if (NormalWeight > 0.001f)
@@ -175,6 +184,7 @@ namespace SD3DDraw
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "normalbae";
                 arg.image = Convert.ToBase64String(normalTexture_.EncodeToPNG());
+                arg.control_mode = (int)ControlMode;
                 args.Add(arg);
             }
             if (LineartWeight > 0.001f)
@@ -184,6 +194,7 @@ namespace SD3DDraw
                 arg.model = "lineart_anime";
                 arg.image = Convert.ToBase64String(imageTexture_.EncodeToPNG());
                 arg.processor_res = 512;
+                arg.control_mode = (int)ControlMode;
                 args.Add(arg);
             }
             request.alwayson_scripts.controlnet.args = args.ToArray();

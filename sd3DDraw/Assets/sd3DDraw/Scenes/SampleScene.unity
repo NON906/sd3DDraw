@@ -146,6 +146,9 @@ MonoBehaviour:
   DepthWeight: 1
   NormalWeight: 1
   LineartWeight: 0
+  ControlMode: 1
+  ChangeMaterials: 1
+  DisableBackgroundMask: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
