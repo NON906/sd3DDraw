@@ -26,6 +26,8 @@ namespace SD3DDraw
         public float NormalWeight = 1f;
         [Range(0f, 2f)]
         public float LineartWeight = 0f;
+        public bool ChangeMaterials = false;
+        public bool DisableBackgroundMask = false;
 
         public Texture2D GeneratedTexture
         {
@@ -43,6 +45,7 @@ namespace SD3DDraw
         Texture2D sdOutputTexture_;
         RunModel runModel_;
         Renderer[] renderers_ = null;
+        List<Material[]> materials_ = null;
         List<int> defaultLayers_ = null;
 
         void Awake()
@@ -62,7 +65,7 @@ namespace SD3DDraw
             runModel_ = FindObjectOfType<RunModel>();
         }
 
-        public void Hide()
+        public void Hide(bool changeMaterials = false)
         {
             if (renderers_ != null || defaultLayers_ != null)
             {
@@ -71,10 +74,24 @@ namespace SD3DDraw
 
             defaultLayers_ = new List<int>();
             renderers_ = GetComponentsInChildren<Renderer>();
+            if (changeMaterials)
+            {
+                materials_ = new List<Material[]>();
+            }
             for (int loop = 0; loop < renderers_.Length; loop++)
             {
                 defaultLayers_.Add(renderers_[loop].gameObject.layer);
                 renderers_[loop].gameObject.layer = LayerMask.NameToLayer("SDTarget");
+                if (changeMaterials)
+                {
+                    materials_.Add(renderers_[loop].materials);
+                    var materials = new Material[renderers_[loop].materials.Length];
+                    for (int loop2 = 0; loop2 < renderers_[loop].materials.Length; loop2++)
+                    {
+                        materials[loop2] = new Material(Shader.Find("Standard"));
+                    }
+                    renderers_[loop].materials = materials;
+                }
             }
         }
 
@@ -88,8 +105,13 @@ namespace SD3DDraw
             for (int loop = renderers_.Length - 1; loop >= 0; loop--)
             {
                 renderers_[loop].gameObject.layer = defaultLayers_[loop];
+                if (materials_ != null)
+                {
+                    renderers_[loop].materials = materials_[loop];
+                }
             }
             renderers_ = null;
+            materials_ = null;
             defaultLayers_ = null;
         }
 
@@ -98,7 +120,7 @@ namespace SD3DDraw
             var defaultMask = sdManager_.CaptureCamera.cullingMask;
             sdManager_.CaptureCamera.cullingMask = 1 << LayerMask.NameToLayer("SDTarget");
 
-            Hide();
+            Hide(ChangeMaterials);
 
             sdManager_.CaptureCamera.Render();
 
@@ -193,13 +215,17 @@ namespace SD3DDraw
 
             RenderTexture.active = RenderTexture.GetTemporary(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
 
-            var maskTexture = runModel_.Execute(sdOutputTexture_);
+            RenderTexture maskTexture = null;
+            if (!DisableBackgroundMask)
+            {
+                maskTexture = runModel_.Execute(sdOutputTexture_);
+            }
             maskMaterial_.SetTexture("_AllTex", depthAllTexture);
             maskMaterial_.SetTexture("_TargetTex", depthTexture_);
             maskMaterial_.SetTexture("_MaskTex", maskTexture);
             Graphics.Blit(sdOutputTexture_, RenderTexture.active, maskMaterial_);
-            GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
 
+            GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
             var pixels = GeneratedTexture.GetPixels32();
             for (int loop = 0; loop < SHRINK_PIXELS; loop++)
             {
