@@ -162,7 +162,14 @@ namespace SD3DDraw
             sdManager_.CaptureCamera.cullingMask = defaultMask;
 
             var request = new Txt2ImgRequest();
-            request.prompt = sdManager_.DefaultPrompt + ", " + ADD_PROMPT + ", " + Prompt;
+            if (DisableBackgroundMask)
+            {
+                request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
+            }
+            else
+            {
+                request.prompt = sdManager_.DefaultPrompt + ", " + ADD_PROMPT + ", " + Prompt;
+            }
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
             request.seed = Seed;
             request.width = GeneratedTexture.width;
