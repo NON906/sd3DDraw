@@ -105,9 +105,10 @@ namespace SD3DDraw
             }
             var defaultMask = CaptureCamera.cullingMask;
             CaptureCamera.cullingMask = ~(1 << LayerMask.NameToLayer("SDTarget"));
-            CaptureCamera.Render();
-            CaptureCamera.cullingMask = defaultMask;
+            //CaptureCamera.Render();
+            yield return new WaitForEndOfFrame();
             Graphics.Blit(CaptureCamera.targetTexture, otherTexture_);
+            CaptureCamera.cullingMask = defaultMask;
             foreach (var drawTarget in drawTargets_)
             {
                 drawTarget.Target.Show();

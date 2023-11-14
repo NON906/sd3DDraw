@@ -130,7 +130,8 @@ namespace SD3DDraw
 
             Hide(ChangeMaterials);
 
-            sdManager_.CaptureCamera.Render();
+            //sdManager_.CaptureCamera.Render();
+            yield return new WaitForEndOfFrame();
 
             RenderTexture.active = RenderTexture.GetTemporary(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
 
