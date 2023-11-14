@@ -23,7 +23,7 @@ namespace SD3DDraw
         public string DefaultPrompt = DEFAULT_PROMPT;
         [TextArea(1, 10)]
         public string DefaultNegativePrompt = DEFAULT_NEGATIVE_PROMPT;
-        public Vector2Int CaptureSize = new Vector2Int(768, 512);
+        public Vector2Int CaptureSize = new Vector2Int(512, 512);
         public Camera CaptureCamera;
         public bool GenerateOnStart = false;
 

@@ -184,6 +184,7 @@ namespace SD3DDraw
                 arg.model = "depth";
                 arg.image = Convert.ToBase64String(depthTexture_.EncodeToPNG());
                 arg.control_mode = (int)ControlMode;
+                arg.weight = DepthWeight;
                 args.Add(arg);
             }
             if (NormalWeight > 0.001f)
@@ -192,6 +193,7 @@ namespace SD3DDraw
                 arg.model = "normalbae";
                 arg.image = Convert.ToBase64String(normalTexture_.EncodeToPNG());
                 arg.control_mode = (int)ControlMode;
+                arg.weight = NormalWeight;
                 args.Add(arg);
             }
             if (LineartWeight > 0.001f)
@@ -202,6 +204,7 @@ namespace SD3DDraw
                 arg.image = Convert.ToBase64String(imageTexture_.EncodeToPNG());
                 arg.processor_res = 512;
                 arg.control_mode = (int)ControlMode;
+                arg.weight = LineartWeight;
                 args.Add(arg);
             }
             request.alwayson_scripts.controlnet.args = args.ToArray();
