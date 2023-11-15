@@ -26,6 +26,7 @@ namespace SD3DDraw
             sdManager.CaptureSize = EditorGUILayout.Vector2IntField("Capture Size", sdManager.CaptureSize);
             sdManager.CaptureCamera = (Camera)EditorGUILayout.ObjectField("Capture Camera", sdManager.CaptureCamera, typeof(Camera), true);
             sdManager.GenerateOnStart = EditorGUILayout.Toggle("Generate On Start", sdManager.GenerateOnStart);
+            sdManager.SaveDirectory = EditorGUILayout.TextField("Save Directory", sdManager.SaveDirectory);
 
             if (EditorApplication.isPlaying)
             {

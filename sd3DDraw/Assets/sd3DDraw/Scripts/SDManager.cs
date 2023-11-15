@@ -27,6 +27,7 @@ namespace SD3DDraw
         public Vector2Int CaptureSize = new Vector2Int(512, 512);
         public Camera CaptureCamera;
         public bool GenerateOnStart = false;
+        public string SaveDirectory = "";
 
         public SDBackGround TargetBackGround
         {
@@ -49,6 +50,7 @@ namespace SD3DDraw
         RenderTexture otherTexture_;
         Material getDepthMaterial_;
         Material overlayMaterial_;
+        int saveId_ = 0;
 
         void Reset()
         {
@@ -158,7 +160,11 @@ namespace SD3DDraw
             targetTexture2D_.ReadPixels(new Rect(0, 0, targetTexture2D_.width, targetTexture2D_.height), 0, 0);
             targetTexture2D_.Apply();
             byte[] bytes = targetTexture2D_.EncodeToPNG();
-            File.WriteAllBytes(@"result.png", bytes);
+            while (File.Exists(Path.Combine(SaveDirectory, "result_" + saveId_.ToString("000000000") + ".png")))
+            {
+                saveId_++;
+            }
+            File.WriteAllBytes(Path.Combine(SaveDirectory, "result_" + saveId_.ToString("000000000") + ".png"), bytes);
 
             RenderTexture.ReleaseTemporary(activeTexture);
 
