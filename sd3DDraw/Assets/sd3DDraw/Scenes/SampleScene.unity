@@ -144,9 +144,14 @@ MonoBehaviour:
   NegativePrompt: 
   Seed: -1
   DepthWeight: 1
+  DepthControlMode: 1
   NormalWeight: 1
+  NormalControlMode: 1
   LineartWeight: 0
-  ControlMode: 1
+  LineartControlMode: 1
+  ReferenceTexture: {fileID: 0}
+  ReferenceWeight: 1
+  ReferenceControlMode: 2
   ChangeMaterials: 1
   DisableBackgroundMask: 0
 --- !u!1 &705507993

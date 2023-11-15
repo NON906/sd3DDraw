@@ -29,12 +29,18 @@ namespace SD3DDraw
         public int Seed = -1;
         [Range(0f, 2f)]
         public float DepthWeight = 1f;
+        public ControlModeEnum DepthControlMode = ControlModeEnum.MyPrompt;
         [Range(0f, 2f)]
         public float NormalWeight = 1f;
+        public ControlModeEnum NormalControlMode = ControlModeEnum.MyPrompt;
         [Range(0f, 2f)]
         public float LineartWeight = 0f;
-        public ControlModeEnum ControlMode = ControlModeEnum.Balanced;
-        public bool ChangeMaterials = false;
+        public ControlModeEnum LineartControlMode = ControlModeEnum.MyPrompt;
+        public Texture2D ReferenceTexture = null;
+        [Range(0f, 2f)]
+        public float ReferenceWeight = 0f;
+        public ControlModeEnum ReferenceControlMode = ControlModeEnum.ControlNet;
+        public bool ChangeMaterials = true;
         public bool DisableBackgroundMask = false;
 
         public Texture2D GeneratedTexture
@@ -96,7 +102,14 @@ namespace SD3DDraw
                     var materials = new Material[renderers_[loop].materials.Length];
                     for (int loop2 = 0; loop2 < renderers_[loop].materials.Length; loop2++)
                     {
-                        materials[loop2] = new Material(Shader.Find("Standard"));
+                        if (renderers_[loop].materials[loop2].color.a >= 0.001f)
+                        {
+                            materials[loop2] = new Material(Shader.Find("Standard"));
+                        }
+                        else
+                        {
+                            materials[loop2] = renderers_[loop].materials[loop2];
+                        }
                     }
                     renderers_[loop].materials = materials;
                 }
@@ -184,7 +197,7 @@ namespace SD3DDraw
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "depth";
                 arg.image = Convert.ToBase64String(depthTexture_.EncodeToPNG());
-                arg.control_mode = (int)ControlMode;
+                arg.control_mode = (int)DepthControlMode;
                 arg.weight = DepthWeight;
                 args.Add(arg);
             }
@@ -193,7 +206,7 @@ namespace SD3DDraw
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "normalbae";
                 arg.image = Convert.ToBase64String(normalTexture_.EncodeToPNG());
-                arg.control_mode = (int)ControlMode;
+                arg.control_mode = (int)NormalControlMode;
                 arg.weight = NormalWeight;
                 args.Add(arg);
             }
@@ -204,8 +217,18 @@ namespace SD3DDraw
                 arg.model = "lineart_anime";
                 arg.image = Convert.ToBase64String(imageTexture_.EncodeToPNG());
                 arg.processor_res = 512;
-                arg.control_mode = (int)ControlMode;
+                arg.control_mode = (int)LineartControlMode;
                 arg.weight = LineartWeight;
+                args.Add(arg);
+            }
+            if (ReferenceWeight > 0.001f && ReferenceTexture != null)
+            {
+                var arg = new Txt2ImgRequestScriptsControlNetArgs();
+                arg.module = "reference_only";
+                arg.image = Convert.ToBase64String(ReferenceTexture.EncodeToPNG());
+                arg.control_mode = (int)ReferenceControlMode;
+                arg.weight = ReferenceWeight;
+                arg.threshold_a = 0.5f;
                 args.Add(arg);
             }
             request.alwayson_scripts.controlnet.args = args.ToArray();

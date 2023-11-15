@@ -12,7 +12,7 @@ namespace SD3DDraw
     {
         public bool enabled = true;
         public string module = "none";
-        public string model;
+        public string model = "none";
         public float weight = 1f;
         public string image;
         public int resize_mode = 1;
@@ -22,6 +22,8 @@ namespace SD3DDraw
         public int control_mode = 0;
         public bool pixel_perfect = false;
         public int processor_res = -1;
+        public float threshold_a = 0.5f;
+        public float threshold_b = -1f;
     }
 
     [Serializable]
