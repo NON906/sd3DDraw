@@ -1,3 +1,4 @@
+using RemoveBackground;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -48,6 +49,14 @@ namespace SD3DDraw
         RenderTexture otherTexture_;
         Material getDepthMaterial_;
         Material overlayMaterial_;
+
+        void Reset()
+        {
+            if (FindObjectOfType<RunModel>() == null)
+            {
+                gameObject.AddComponent<RunModel>();
+            }
+        }
 
         void Start()
         {
