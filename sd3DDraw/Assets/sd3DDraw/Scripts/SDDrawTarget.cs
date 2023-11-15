@@ -26,7 +26,7 @@ namespace SD3DDraw
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
-        public int Seed = -1;
+        public long Seed = -1;
         [Range(0f, 2f)]
         public float DepthWeight = 1f;
         public ControlModeEnum DepthControlMode = ControlModeEnum.MyPrompt;
@@ -323,6 +323,12 @@ namespace SD3DDraw
             GeneratedTexture.Apply();
 
             RenderTexture.ReleaseTemporary(RenderTexture.active);
+
+            if (sdManager_.KeepSeedOnPlaying)
+            {
+                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
+                Seed = info.seed;
+            }
         }
     }
 }

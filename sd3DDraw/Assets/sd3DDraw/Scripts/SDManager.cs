@@ -31,6 +31,7 @@ namespace SD3DDraw
         public Camera CaptureCamera;
         public bool GenerateOnStart = false;
         public string SaveDirectory = "";
+        public bool KeepSeedOnPlaying = false;
 
         public SDBackGround TargetBackGround
         {

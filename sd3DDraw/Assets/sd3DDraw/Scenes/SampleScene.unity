@@ -842,7 +842,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5448589522947437311, guid: e14cb9822f2a6ca4daf7dbe119a6a150, type: 3}
       propertyPath: HiresFixScale
-      value: 2
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5448589522947437311, guid: e14cb9822f2a6ca4daf7dbe119a6a150, type: 3}
+      propertyPath: KeepSeedOnPlaying
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e14cb9822f2a6ca4daf7dbe119a6a150, type: 3}

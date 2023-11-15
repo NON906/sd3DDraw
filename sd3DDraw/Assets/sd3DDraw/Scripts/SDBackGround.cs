@@ -44,7 +44,7 @@ namespace SD3DDraw
         public string prompt;
         public string negative_prompt;
         public string[] styles = new string[0];
-        public int seed = -1;
+        public long seed = -1;
         public int steps = 20;
         public int cfg_scale = 7;
         public int width;
@@ -66,13 +66,19 @@ namespace SD3DDraw
         public string info;
     }
 
+    [Serializable]
+    class Txt2ImgResponseInfo
+    {
+        public long seed;
+    }
+
     public class SDBackGround : MonoBehaviour
     {
         [TextArea(1, 10)]
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
-        public int Seed = -1;
+        public long Seed = -1;
 
         public Texture2D GeneratedTexture
         {
@@ -128,6 +134,12 @@ namespace SD3DDraw
 
             var responseString = webRequest.downloadHandler.text;
             var response = JsonUtility.FromJson<Txt2ImgResponse>(responseString);
+
+            if (sdManager_.KeepSeedOnPlaying)
+            {
+                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
+                Seed = info.seed;
+            }
 
             string baseImageOnBase64 = response.images[0];
             byte[] baseImage = Convert.FromBase64String(response.images[0]);
