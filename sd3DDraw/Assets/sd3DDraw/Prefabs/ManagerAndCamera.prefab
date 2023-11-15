@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5448589522947437251}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
-  m_LocalPosition: {x: 0, y: 1.14, z: 0.57}
+  m_LocalPosition: {x: 0, y: 1.251, z: 0.57}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -53,9 +53,12 @@ MonoBehaviour:
     watermark, username, artist name, text, logo, logos
   CaptureSize: {x: 512, y: 512}
   HiresFixScale: 1
+  HiresFixUpscaler: R-ESRGAN 4x+ Anime6B
+  DenoisingStrength: 0.2
   CaptureCamera: {fileID: 5448589522947437249}
   GenerateOnStart: 0
   SaveDirectory: 
+  KeepSeedOnPlaying: 0
 --- !u!20 &5448589522947437249
 Camera:
   m_ObjectHideFlags: 0
