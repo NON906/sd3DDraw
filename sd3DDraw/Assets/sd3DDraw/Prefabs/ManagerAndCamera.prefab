@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 5448589522947437310}
   - component: {fileID: 5448589522947437311}
   - component: {fileID: 5448589522947437249}
-  - component: {fileID: 5448589522947437308}
   m_Layer: 0
   m_Name: ManagerAndCamera
   m_TagString: Untagged
@@ -102,16 +101,3 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &5448589522947437308
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5448589522947437251}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 35abe36043f61fe43a7d14782dbf9365, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  modelAsset: {fileID: 5022602860645237092, guid: d416279dcc610224c8fc4769efb32368, type: 3}

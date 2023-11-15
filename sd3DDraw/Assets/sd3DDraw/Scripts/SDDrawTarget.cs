@@ -70,7 +70,10 @@ namespace SD3DDraw
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
+        }
 
+        void Start()
+        {
             runModel_ = FindObjectOfType<RunModel>();
         }
 

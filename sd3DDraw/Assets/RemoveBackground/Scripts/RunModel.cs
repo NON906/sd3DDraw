@@ -7,36 +7,22 @@ namespace RemoveBackground
 {
     public class RunModel : MonoBehaviour
     {
-        public NNModel modelAsset;
-        public NNModel ModelAsset
-        {
-            get
-            {
-                return modelAsset;
-            }
-            set
-            {
-                if (modelAsset != value)
-                {
-                    modelAsset = value;
-                    changeModelAsset();
-                }
-            }
-        }
+        NNModel modelAsset_;
         Model runtimeModel_;
         IWorker worker_;
 
         void changeModelAsset()
         {
-            if (modelAsset != null)
+            if (modelAsset_ != null)
             {
-                runtimeModel_ = ModelLoader.Load(modelAsset);
+                runtimeModel_ = ModelLoader.Load(modelAsset_);
                 worker_ = WorkerFactory.CreateWorker(WorkerFactory.Type.Auto, runtimeModel_);
             }
         }
 
         void Awake()
         {
+            modelAsset_ = Resources.Load<NNModel>("Models/isnet-anime");
             changeModelAsset();
         }
 

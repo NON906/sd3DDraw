@@ -72,16 +72,13 @@ namespace SD3DDraw
         Material overlayMaterial_;
         int saveId_ = 0;
 
-        void Reset()
+        void Start()
         {
             if (FindObjectOfType<RunModel>() == null)
             {
                 gameObject.AddComponent<RunModel>();
             }
-        }
 
-        void Start()
-        {
             CaptureCamera.depthTextureMode = DepthTextureMode.DepthNormals;
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             overlayMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/Overlay"));
