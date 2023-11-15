@@ -22,7 +22,7 @@ namespace SD3DDraw
         public int control_mode = 0;
         public bool pixel_perfect = false;
         public int processor_res = -1;
-        public float threshold_a = 0.5f;
+        public float threshold_a = -1f;
         public float threshold_b = -1f;
     }
 
@@ -51,6 +51,11 @@ namespace SD3DDraw
         public int height;
         public string sampler_index = "Euler a";
         public bool save_images = false;
+        public bool enable_hr = false;
+        public float hr_scale = 2f;
+        public string hr_upscaler = "R-ESRGAN 4x+ Anime6B";
+        public int hr_second_pass_steps = 0;
+        public float denoising_strength = 0f;
         public Txt2ImgRequestScripts alwayson_scripts = null;
     }
 
@@ -81,18 +86,27 @@ namespace SD3DDraw
         {
             sdManager_ = FindObjectOfType<SDManager>();
             sdManager_.TargetBackGround = this;
+        }
 
-            GeneratedTexture = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+        void init()
+        {
+            GeneratedTexture = new Texture2D(sdManager_.Width, sdManager_.Height);
         }
 
         public IEnumerator Generate()
         {
+            init();
+
             var request = new Txt2ImgRequest();
             request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
             request.seed = Seed;
-            request.width = GeneratedTexture.width;
-            request.height = GeneratedTexture.height;
+            request.width = sdManager_.CaptureSize.x;
+            request.height = sdManager_.CaptureSize.y;
+            request.enable_hr = sdManager_.HiresFixScale > 1.001f;
+            request.hr_scale = sdManager_.HiresFixScale;
+            request.hr_upscaler = sdManager_.HiresFixUpscaler;
+            request.denoising_strength = sdManager_.HiresFixScale > 1.001f ? sdManager_.DenoisingStrength : 0f;
 
             var jsonRequest = JsonUtility.ToJson(request);
 

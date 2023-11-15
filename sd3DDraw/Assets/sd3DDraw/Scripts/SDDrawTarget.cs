@@ -67,16 +67,20 @@ namespace SD3DDraw
             sdManager_ = FindObjectOfType<SDManager>();
             sdManager_.AddDrawTarget(this);
 
-            GeneratedTexture = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
-            depthTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
-            normalTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
-            imageTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
-            sdOutputTexture_ = new Texture2D(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
 
             runModel_ = FindObjectOfType<RunModel>();
+        }
+
+        void init()
+        {
+            GeneratedTexture = new Texture2D(sdManager_.Width, sdManager_.Height);
+            depthTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
+            normalTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
+            imageTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
+            sdOutputTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
         }
 
         public void Hide(bool changeMaterials = false)
@@ -138,6 +142,8 @@ namespace SD3DDraw
 
         public IEnumerator Generate(RenderTexture depthAllTexture)
         {
+            init();
+
             var defaultMask = sdManager_.CaptureCamera.cullingMask;
             sdManager_.CaptureCamera.cullingMask = 1 << LayerMask.NameToLayer("SDTarget");
 
@@ -146,7 +152,7 @@ namespace SD3DDraw
             //sdManager_.CaptureCamera.Render();
             yield return new WaitForEndOfFrame();
 
-            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
 
             Graphics.Blit(sdManager_.CaptureCamera.targetTexture, RenderTexture.active, getDepthMaterial_);
             depthTexture_.ReadPixels(new Rect(0, 0, depthTexture_.width, depthTexture_.height), 0, 0);
@@ -186,8 +192,12 @@ namespace SD3DDraw
             }
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
             request.seed = Seed;
-            request.width = GeneratedTexture.width;
-            request.height = GeneratedTexture.height;
+            request.width = sdManager_.CaptureSize.x;
+            request.height = sdManager_.CaptureSize.y;
+            request.enable_hr = sdManager_.HiresFixScale > 1.001f;
+            request.hr_scale = sdManager_.HiresFixScale;
+            request.hr_upscaler = sdManager_.HiresFixUpscaler;
+            request.denoising_strength = sdManager_.HiresFixScale > 1.001f ? sdManager_.DenoisingStrength : 0f;
             request.alwayson_scripts = new Txt2ImgRequestScripts();
             request.alwayson_scripts.controlnet = new Txt2ImgRequestScriptsControlNet();
 
@@ -258,7 +268,7 @@ namespace SD3DDraw
             byte[] baseImage = Convert.FromBase64String(response.images[0]);
             sdOutputTexture_.LoadImage(baseImage);
 
-            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.CaptureSize.x, sdManager_.CaptureSize.y);
+            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
 
             RenderTexture maskTexture = null;
             if (!DisableBackgroundMask)

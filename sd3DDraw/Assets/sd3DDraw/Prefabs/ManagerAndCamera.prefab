@@ -52,6 +52,7 @@ MonoBehaviour:
     bad face, bad fingers, bad anatomy, missing fingers, low res, cropped, signature,
     watermark, username, artist name, text, logo, logos
   CaptureSize: {x: 512, y: 512}
+  HiresFixScale: 1
   CaptureCamera: {fileID: 5448589522947437249}
   GenerateOnStart: 0
   SaveDirectory: 
@@ -83,7 +84,7 @@ Camera:
   field of view: 60
   orthographic: 0
   orthographic size: 5
-  m_Depth: 0
+  m_Depth: -100
   m_CullingMask:
     serializedVersion: 2
     m_Bits: 4294967295

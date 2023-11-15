@@ -25,6 +25,9 @@ namespace SD3DDraw
         [TextArea(1, 10)]
         public string DefaultNegativePrompt = DEFAULT_NEGATIVE_PROMPT;
         public Vector2Int CaptureSize = new Vector2Int(512, 512);
+        public float HiresFixScale = 1f;
+        public string HiresFixUpscaler = "R-ESRGAN 4x+ Anime6B";
+        public float DenoisingStrength = 0.2f;
         public Camera CaptureCamera;
         public bool GenerateOnStart = false;
         public string SaveDirectory = "";
@@ -41,6 +44,22 @@ namespace SD3DDraw
             get
             {
                 return isGenerating_;
+            }
+        }
+
+        public int Width
+        {
+            get
+            {
+                return (int)(CaptureSize.x * HiresFixScale);
+            }
+        }
+
+        public int Height
+        {
+            get
+            {
+                return (int)(CaptureSize.y * HiresFixScale);
             }
         }
 
@@ -63,10 +82,6 @@ namespace SD3DDraw
         void Start()
         {
             CaptureCamera.depthTextureMode = DepthTextureMode.DepthNormals;
-            CaptureCamera.targetTexture = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
-            targetTexture2D_ = new Texture2D(CaptureSize.x, CaptureSize.y);
-            depthAllTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0);
-            otherTexture_ = new RenderTexture(CaptureSize.x, CaptureSize.y, 0, RenderTextureFormat.ARGB32);
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             overlayMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/Overlay"));
 
@@ -74,6 +89,14 @@ namespace SD3DDraw
             {
                 Generate();
             }
+        }
+
+        void init()
+        {
+            CaptureCamera.targetTexture = new RenderTexture(Width, Height, 0, RenderTextureFormat.ARGB32);
+            targetTexture2D_ = new Texture2D(Width, Height);
+            depthAllTexture_ = new RenderTexture(Width, Height, 0);
+            otherTexture_ = new RenderTexture(Width, Height, 0, RenderTextureFormat.ARGB32);
         }
 
         public void AddDrawTarget(SDDrawTarget target)
@@ -100,6 +123,8 @@ namespace SD3DDraw
 
             float defaultTimeScale = Time.timeScale;
             Time.timeScale = 0f;
+
+            init();
 
             if (TargetBackGround != null && CaptureCamera.clearFlags == CameraClearFlags.Skybox)
             {
