@@ -36,11 +36,13 @@ namespace SD3DDraw
             sdManager.SavePngFile = EditorGUILayout.Toggle("Save Png File", sdManager.SavePngFile);
             sdManager.SavePsdFile = EditorGUILayout.Toggle("Save Psd File", sdManager.SavePsdFile);
 
-            if (EditorApplication.isPlaying && sdManager.gameObject.scene.IsValid())
+            if (sdManager.gameObject.scene.IsValid())
             {
                 EditorGUI.BeginDisabledGroup(sdManager.IsGenerating);
                 if (GUILayout.Button("Generate"))
                 {
+                    var window = EditorWindow.GetWindow(typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView"));
+                    window.Show();
                     sdManager.Generate();
                 }
                 EditorGUI.EndDisabledGroup();

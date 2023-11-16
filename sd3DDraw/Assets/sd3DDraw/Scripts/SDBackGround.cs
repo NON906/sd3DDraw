@@ -72,6 +72,7 @@ namespace SD3DDraw
         public long seed;
     }
 
+    [ExecuteInEditMode]
     public class SDBackGround : MonoBehaviour
     {
         [TextArea(1, 10)]
@@ -88,10 +89,9 @@ namespace SD3DDraw
 
         SDManager sdManager_;
 
-        void Awake()
+        void Start()
         {
             sdManager_ = FindObjectOfType<SDManager>();
-            sdManager_.TargetBackGround = this;
         }
 
         void init()

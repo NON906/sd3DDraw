@@ -8,6 +8,7 @@ using UnityEngine;
 
 namespace SD3DDraw
 {
+    [ExecuteInEditMode]
     public class SDManager : MonoBehaviour
     {
         const string API_URL = "http://127.0.0.1:7860";
@@ -39,7 +40,7 @@ namespace SD3DDraw
         public SDBackGround TargetBackGround
         {
             get;
-            set;
+            private set;
         } = null;
 
         bool isGenerating_ = false;
@@ -98,14 +99,16 @@ namespace SD3DDraw
             targetTexture2D_ = new Texture2D(Width, Height);
             depthAllTexture_ = new RenderTexture(Width, Height, 0);
             otherTexture_ = new RenderTexture(Width, Height, 0, RenderTextureFormat.ARGB32);
-        }
 
-        public void AddDrawTarget(SDDrawTarget target)
-        {
-            var drawTarget = new DrawTargetWithDistance();
-            drawTarget.Distance = Vector3.Distance(target.transform.position, CaptureCamera.transform.position);
-            drawTarget.Target = target;
-            drawTargets_.Add(drawTarget);
+            TargetBackGround = FindObjectOfType<SDBackGround>();
+            var targets = FindObjectsOfType<SDDrawTarget>();
+            foreach (var target in targets)
+            {
+                var drawTarget = new DrawTargetWithDistance();
+                drawTarget.Distance = Vector3.Distance(target.transform.position, CaptureCamera.transform.position);
+                drawTarget.Target = target;
+                drawTargets_.Add(drawTarget);
+            }
             drawTargets_ = drawTargets_.OrderByDescending(item => item.Distance).ToList();
         }
 

@@ -10,6 +10,7 @@ using UnityEngine.Networking;
 
 namespace SD3DDraw
 {
+    [ExecuteInEditMode]
     public class SDDrawTarget : MonoBehaviour
     {
         const string ADD_PROMPT = "simple background";
@@ -65,9 +66,6 @@ namespace SD3DDraw
 
         void Awake()
         {
-            sdManager_ = FindObjectOfType<SDManager>();
-            sdManager_.AddDrawTarget(this);
-
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
@@ -76,6 +74,8 @@ namespace SD3DDraw
 
         void Start()
         {
+            sdManager_ = FindObjectOfType<SDManager>();
+
             runModel_ = FindObjectOfType<RunModel>();
         }
 
@@ -107,20 +107,20 @@ namespace SD3DDraw
                 renderers_[loop].gameObject.layer = LayerMask.NameToLayer("SDTarget");
                 if (changeMaterials)
                 {
-                    materials_.Add(renderers_[loop].materials);
-                    var materials = new Material[renderers_[loop].materials.Length];
-                    for (int loop2 = 0; loop2 < renderers_[loop].materials.Length; loop2++)
+                    materials_.Add(renderers_[loop].sharedMaterials);
+                    var materials = new Material[renderers_[loop].sharedMaterials.Length];
+                    for (int loop2 = 0; loop2 < renderers_[loop].sharedMaterials.Length; loop2++)
                     {
-                        if (renderers_[loop].materials[loop2].color.a >= 0.001f)
+                        if (renderers_[loop].sharedMaterials[loop2].color.a >= 0.001f)
                         {
                             materials[loop2] = new Material(Shader.Find("Standard"));
                         }
                         else
                         {
-                            materials[loop2] = renderers_[loop].materials[loop2];
+                            materials[loop2] = renderers_[loop].sharedMaterials[loop2];
                         }
                     }
-                    renderers_[loop].materials = materials;
+                    renderers_[loop].sharedMaterials = materials;
                 }
             }
         }
@@ -137,7 +137,7 @@ namespace SD3DDraw
                 renderers_[loop].gameObject.layer = defaultLayers_[loop];
                 if (materials_ != null)
                 {
-                    renderers_[loop].materials = materials_[loop];
+                    renderers_[loop].sharedMaterials = materials_[loop];
                 }
             }
             renderers_ = null;
