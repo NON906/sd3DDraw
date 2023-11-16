@@ -1,0 +1,18 @@
+{
+    "name": "MUMEI.SD3DDraw.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:f753ec46232ad40409a6444ab36a2ee5"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

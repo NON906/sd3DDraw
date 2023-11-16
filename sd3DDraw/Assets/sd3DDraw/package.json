@@ -1,0 +1,18 @@
+{
+    "name": "online.mumeigames.sd3ddraw",
+    "version": "0.1.0",
+    "description": "",
+    "displayName": "SD_3DDrawCamera",
+    "unity": "2021.3",
+    "author": {
+        "name": "NON906",
+        "email": "mumeigames@gmail.com"
+    },
+    "samples": [
+    ],
+    "changelogUrl": "",
+    "documentationUrl": "",
+    "dependencies": {
+        "com.unity.barracuda": "3.0.0"
+    }
+}

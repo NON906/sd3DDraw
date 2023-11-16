@@ -5,13 +5,5 @@
 /sd3DDraw/.vs/
 /sd3DDraw/Temp/
 /sd3DDraw/*.csproj
-/sd3DDraw/Assets/Models/Shion/
-/sd3DDraw/Assets/Models/Shion.meta
-/sd3DDraw/Assets/RemoveBackground/Models/
-/sd3DDraw/Assets/RemoveBackground/Resources/Models/*.onnx
-/sd3DDraw/Assets/UnityChanLive/
-/sd3DDraw/Assets/UnityChanLive.meta
-/sd3DDraw/Assets/Images/
-/sd3DDraw/Assets/Images.meta
 /sd3DDraw/result_*.png
-/sd3DDraw/Packages/online.mumeigames.RemoveBackground@0.1.0/Resources/Models/*.onnx
+/sd3DDraw/Packages/online.mumeigames.RemoveBackground@0.1.0/
