@@ -613,6 +613,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5448589522947437311, guid: e14cb9822f2a6ca4daf7dbe119a6a150, type: 3}
+      propertyPath: SavePsdFile
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5448589522947437311, guid: e14cb9822f2a6ca4daf7dbe119a6a150, type: 3}
       propertyPath: HiresFixScale
       value: 1
       objectReference: {fileID: 0}

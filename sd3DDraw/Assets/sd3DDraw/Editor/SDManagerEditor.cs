@@ -33,6 +33,8 @@ namespace SD3DDraw
             sdManager.CaptureCamera = (Camera)EditorGUILayout.ObjectField("Capture Camera", sdManager.CaptureCamera, typeof(Camera), true);
             sdManager.GenerateOnStart = EditorGUILayout.Toggle("Generate On Start", sdManager.GenerateOnStart);
             sdManager.SaveDirectory = EditorGUILayout.TextField("Save Directory", sdManager.SaveDirectory);
+            sdManager.SavePngFile = EditorGUILayout.Toggle("Save Png File", sdManager.SavePngFile);
+            sdManager.SavePsdFile = EditorGUILayout.Toggle("Save Psd File", sdManager.SavePsdFile);
 
             if (EditorApplication.isPlaying && sdManager.gameObject.scene.IsValid())
             {

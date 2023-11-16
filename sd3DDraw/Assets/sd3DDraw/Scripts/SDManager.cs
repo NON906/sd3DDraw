@@ -1,6 +1,7 @@
 using RemoveBackground;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -31,6 +32,8 @@ namespace SD3DDraw
         public Camera CaptureCamera;
         public bool GenerateOnStart = false;
         public string SaveDirectory = "";
+        public bool SavePngFile = true;
+        public bool SavePsdFile = false;
         public bool KeepSeedOnPlaying = false;
 
         public SDBackGround TargetBackGround
@@ -157,6 +160,25 @@ namespace SD3DDraw
                 yield return drawTarget.Target.Generate(depthAllTexture_);
             }
 
+            if (SavePngFile)
+            {
+                generatePng();
+            }
+
+            if (SavePsdFile)
+            {
+                generatePsd();
+            }
+
+            saveId_++;
+
+            Time.timeScale = defaultTimeScale;
+
+            isGenerating_ = false;
+        }
+
+        void generatePng()
+        {
             var activeTexture = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
             var tempTex = RenderTexture.GetTemporary(targetTexture2D_.width, targetTexture2D_.height, 0, RenderTextureFormat.ARGB32);
 
@@ -190,10 +212,68 @@ namespace SD3DDraw
             File.WriteAllBytes(Path.Combine(SaveDirectory, "result_" + saveId_.ToString("000000000") + ".png"), bytes);
 
             RenderTexture.ReleaseTemporary(activeTexture);
+        }
 
-            Time.timeScale = defaultTimeScale;
+        void generatePsd()
+        {
+            Directory.CreateDirectory("_sdTemp");
 
-            isGenerating_ = false;
+            List<string> files = new List<string>();
+            byte[] bytes;
+
+            if (TargetBackGround != null && TargetBackGround.GeneratedTexture != null)
+            {
+                bytes = TargetBackGround.GeneratedTexture.EncodeToPNG();
+                File.WriteAllBytes(Path.Combine("_sdTemp", "background.png"), bytes);
+                files.Add(Path.Combine("_sdTemp", "background.png"));
+            }
+
+            RenderTexture.active = otherTexture_;
+            targetTexture2D_.ReadPixels(new Rect(0, 0, targetTexture2D_.width, targetTexture2D_.height), 0, 0);
+            targetTexture2D_.Apply();
+            bytes = targetTexture2D_.EncodeToPNG();
+            File.WriteAllBytes(Path.Combine("_sdTemp", "other.png"), bytes);
+            files.Add(Path.Combine("_sdTemp", "other.png"));
+
+            int loop = 0;
+            foreach (var drawTarget in drawTargets_)
+            {
+                bytes = drawTarget.Target.GeneratedTexture.EncodeToPNG();
+                File.WriteAllBytes(Path.Combine("_sdTemp", loop + ".png"), bytes);
+                files.Add(Path.Combine("_sdTemp", loop + ".png"));
+                loop++;
+            }
+
+            string args = "";
+            foreach (var file in files)
+            {
+                args += "\"" + file + "\" ";
+            }
+            args += "( -clone 0";
+            for (int loop2 = 1; loop2 < files.Count; loop2++)
+            {
+                args += "," + loop2;
+            }
+            args += " -flatten ) -insert 0 ";
+            while (File.Exists(Path.Combine(SaveDirectory, "result_" + saveId_.ToString("000000000") + ".psd")))
+            {
+                saveId_++;
+            }
+            args += "\"" + Path.Combine(SaveDirectory, "result_" + saveId_.ToString("000000000") + ".psd") + "\"";
+
+            //UnityEngine.Debug.Log(args);
+
+            using (Process saveProcess = new Process())
+            {
+                saveProcess.StartInfo.UseShellExecute = false;
+                saveProcess.StartInfo.FileName = "magick";
+                saveProcess.StartInfo.Arguments = args;
+                saveProcess.StartInfo.CreateNoWindow = true;
+                saveProcess.Start();
+                saveProcess.WaitForExit();
+            }
+
+            Directory.Delete("_sdTemp", true);
         }
     }
 }
