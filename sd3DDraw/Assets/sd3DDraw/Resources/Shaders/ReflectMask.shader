@@ -1,9 +1,10 @@
-Shader "Hidden/SD3DDraw/CalcMask"
+Shader "Hidden/SD3DDraw/ReflectMask"
 {
     Properties
     {
-        _MainTex ("TargetDepth", 2D) = "white" {}
-        _AllTex ("AllDepth", 2D) = "white" {}
+        _MainTex ("Texture", 2D) = "white" {}
+        _MaskTex ("Mask", 2D) = "white" {}
+        _AddMaskTex ("Add Mask", 2D) = "white" {}
     }
     SubShader
     {
@@ -29,32 +30,36 @@ Shader "Hidden/SD3DDraw/CalcMask"
             struct v2f
             {
                 float2 uv : TEXCOORD0;
-                float2 uvall : TEXCOORD1;
+                float2 uvmask : TEXCOORD1;
+                float2 uvaddmask : TEXCOORD2;
                 float4 vertex : SV_POSITION;
             };
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-            sampler2D _AllTex;
-            float4 _AllTex_ST;
+            sampler2D _MaskTex;
+            float4 _MaskTex_ST;
+            sampler2D _AddMaskTex;
+            float4 _AddMaskTex_ST;
 
             v2f vert (appdata v)
             {
                 v2f o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-                o.uvall = TRANSFORM_TEX(v.uv, _AllTex);
+                o.uvmask = TRANSFORM_TEX(v.uv, _MaskTex);
+                o.uvaddmask = TRANSFORM_TEX(v.uv, _AddMaskTex);
                 return o;
             }
 
             fixed4 frag (v2f i) : SV_Target
             {
-                float coltarget = tex2D(_MainTex, i.uv).x;
-                float colall = tex2D(_AllTex, i.uvall).x;
-                float addmask = step(0.01, colall - coltarget) * step(0.01, coltarget);
-                float retval = 1 - addmask;
+                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 mask = tex2D(_MaskTex, i.uvmask);
+                fixed4 addmask = tex2D(_AddMaskTex, i.uvaddmask);
+                col.w = addmask.x * mask.x;
                 
-                return fixed4(retval, retval, retval, 1);
+                return col;
             }
             ENDCG
         }

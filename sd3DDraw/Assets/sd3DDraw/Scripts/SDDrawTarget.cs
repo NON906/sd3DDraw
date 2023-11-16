@@ -55,6 +55,7 @@ namespace SD3DDraw
         Material getNormalMaterial_;
         Texture2D normalTexture_;
         Material maskMaterial_;
+        Material reflectMaskMaterial_;
         Texture2D imageTexture_;
         Texture2D sdOutputTexture_;
         RunModel runModel_;
@@ -70,6 +71,7 @@ namespace SD3DDraw
             getDepthMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetDepth"));
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
+            reflectMaskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/ReflectMask"));
         }
 
         void Start()
@@ -271,18 +273,16 @@ namespace SD3DDraw
             byte[] baseImage = Convert.FromBase64String(response.images[0]);
             sdOutputTexture_.LoadImage(baseImage);
 
-            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
-
             RenderTexture maskTexture = null;
             if (!DisableBackgroundMask)
             {
                 maskTexture = runModel_.Execute(sdOutputTexture_);
             }
+            var addMaskTexture = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
             maskMaterial_.SetTexture("_AllTex", depthAllTexture);
-            maskMaterial_.SetTexture("_TargetTex", depthTexture_);
-            maskMaterial_.SetTexture("_MaskTex", maskTexture);
-            Graphics.Blit(sdOutputTexture_, RenderTexture.active, maskMaterial_);
+            Graphics.Blit(depthTexture_, addMaskTexture, maskMaterial_);
 
+            RenderTexture.active = addMaskTexture;
             GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
             var pixels = GeneratedTexture.GetPixels32();
             for (int loop = 0; loop < SHRINK_PIXELS; loop++)
@@ -292,17 +292,27 @@ namespace SD3DDraw
                 {
                     for (int y = 1; y < GeneratedTexture.height - 1; y++)
                     {
-                        if (pixels[x + y * GeneratedTexture.width].a <= 0)
+                        if (pixels[x + y * GeneratedTexture.width].r <= 0)
                         {
-                            newPixels[(x + 1) + y * GeneratedTexture.width].a = 0;
-                            newPixels[(x - 1) + y * GeneratedTexture.width].a = 0;
-                            newPixels[x + (y + 1) * GeneratedTexture.width].a = 0;
-                            newPixels[x + (y - 1) * GeneratedTexture.width].a = 0;
+                            newPixels[(x + 1) + y * GeneratedTexture.width].r = 0;
+                            newPixels[(x - 1) + y * GeneratedTexture.width].r = 0;
+                            newPixels[x + (y + 1) * GeneratedTexture.width].r = 0;
+                            newPixels[x + (y - 1) * GeneratedTexture.width].r = 0;
                         }
                     }
                 }
                 pixels = newPixels;
             }
+            GeneratedTexture.SetPixels32(pixels);
+            GeneratedTexture.Apply();
+            RenderTexture.ReleaseTemporary(addMaskTexture);
+
+            RenderTexture.active = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
+            reflectMaskMaterial_.SetTexture("_MaskTex", maskTexture);
+            reflectMaskMaterial_.SetTexture("_AddMaskTex", GeneratedTexture);
+            Graphics.Blit(sdOutputTexture_, RenderTexture.active, reflectMaskMaterial_);
+            GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
+            pixels = GeneratedTexture.GetPixels32();
             for (int loop = 0; loop < SHRINK_PIXELS; loop++)
             {
                 var newPixels = pixels.ToArray();
@@ -322,9 +332,7 @@ namespace SD3DDraw
                 pixels = newPixels;
             }
             GeneratedTexture.SetPixels32(pixels);
-
             GeneratedTexture.Apply();
-
             RenderTexture.ReleaseTemporary(RenderTexture.active);
 
             if (sdManager_.KeepSeedOnPlaying)
