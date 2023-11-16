@@ -248,6 +248,12 @@
       },
       "hash": "01659457d8f0db619c97356c684682a472bb6dd1"
     },
+    "online.mumeigames.removebackground": {
+      "version": "file:online.mumeigames.RemoveBackground@0.1.0",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "com.unity.modules.ai": {
       "version": "1.0.0",
       "depth": 0,

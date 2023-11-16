@@ -1,0 +1,15 @@
+{
+    "name": "online.mumeigames.removebackground",
+    "version": "0.1.0",
+    "description": "",
+    "displayName": "Remove Background",
+    "unity": "2021.3",
+    "author": {
+        "name": "NON906",
+        "email": "mumeigames@gmail.com"
+    },
+    "samples": [
+    ],
+    "changelogUrl": "",
+    "documentationUrl": ""
+}
