@@ -41,7 +41,7 @@ namespace SD3DDraw
             {
                 Directory.CreateDirectory("Packages/online.mumeigames.RemoveBackground@0.1.0/Resources/Models");
 
-                download("", "Packages/online.mumeigames.RemoveBackground@0.1.0/Resources/Models/isnet-anime.onnx");
+                download("https://github.com/NON906/sd3DDraw/releases/download/ver0.1.0/isnet-anime.onnx", "Packages/online.mumeigames.RemoveBackground@0.1.0/Resources/Models/isnet-anime.onnx");
 
                 AssetDatabase.CopyAsset("Assets/sd3DDraw/Jsons/package_local.json", "Packages/online.mumeigames.RemoveBackground@0.1.0/package.json");
                 AssetDatabase.Refresh();
