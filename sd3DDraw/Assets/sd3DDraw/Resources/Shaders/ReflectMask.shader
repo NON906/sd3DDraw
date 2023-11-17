@@ -57,7 +57,7 @@ Shader "Hidden/SD3DDraw/ReflectMask"
                 fixed4 col = tex2D(_MainTex, i.uv);
                 fixed4 mask = tex2D(_MaskTex, i.uvmask);
                 fixed4 addmask = tex2D(_AddMaskTex, i.uvaddmask);
-                col.w = addmask.x * mask.x;
+                col.w = col.w * addmask.x * mask.x;
                 
                 return col;
             }

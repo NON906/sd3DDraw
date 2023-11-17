@@ -8,23 +8,37 @@ namespace RemoveBackground
     [ExecuteInEditMode]
     public class RunModel : MonoBehaviour
     {
-        NNModel modelAsset_;
+        public NNModel modelAsset;
+        public NNModel ModelAsset
+        {
+            get
+            {
+                return modelAsset;
+            }
+            set
+            {
+                if (modelAsset != value)
+                {
+                    modelAsset = value;
+                    changeModelAsset();
+                }
+            }
+        }
         Model runtimeModel_;
         IWorker worker_;
 
-        void changeModelAsset()
+        void Start()
         {
-            if (modelAsset_ != null)
-            {
-                runtimeModel_ = ModelLoader.Load(modelAsset_);
-                worker_ = WorkerFactory.CreateWorker(WorkerFactory.Type.Auto, runtimeModel_);
-            }
+            changeModelAsset();
         }
 
-        void Awake()
+        void changeModelAsset()
         {
-            modelAsset_ = Resources.Load<NNModel>("Models/isnet-anime");
-            changeModelAsset();
+            if (modelAsset != null)
+            {
+                runtimeModel_ = ModelLoader.Load(modelAsset);
+                worker_ = WorkerFactory.CreateWorker(WorkerFactory.Type.Auto, runtimeModel_);
+            }
         }
 
         public RenderTexture Execute(Texture targetTexture)
@@ -35,6 +49,14 @@ namespace RemoveBackground
             var channelCount = 3;
             var input = new Tensor(inputTexture, channelCount);
 
+            if (ModelAsset == null)
+            {
+                ModelAsset = Resources.Load<NNModel>("Models/isnet-anime");
+            }
+            else
+            {
+                changeModelAsset();
+            }
             worker_.Execute(input);
 
             Tensor output = worker_.PeekOutput("mask");

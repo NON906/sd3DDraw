@@ -5,6 +5,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -14,7 +17,7 @@ namespace SD3DDraw
     public class SDDrawTarget : MonoBehaviour
     {
         const string ADD_PROMPT = "simple background";
-        const int SHRINK_PIXELS = 1;
+        const int ALPHA_THRESHOLD = 10;
 
         public enum ControlModeEnum
         {
@@ -43,6 +46,7 @@ namespace SD3DDraw
         public ControlModeEnum ReferenceControlMode = ControlModeEnum.ControlNet;
         public bool ChangeMaterials = true;
         public bool DisableBackgroundMask = false;
+        public int RemovalPixels = 8;
 
         public Texture2D GeneratedTexture
         {
@@ -276,7 +280,9 @@ namespace SD3DDraw
             RenderTexture maskTexture = null;
             if (!DisableBackgroundMask)
             {
-                maskTexture = runModel_.Execute(sdOutputTexture_);
+                var originalMaskTexture = runModel_.Execute(sdOutputTexture_);
+                maskTexture = RenderTexture.GetTemporary(sdOutputTexture_.width, sdOutputTexture_.height);
+                Graphics.Blit(originalMaskTexture, maskTexture);
             }
             var addMaskTexture = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
             maskMaterial_.SetTexture("_AllTex", depthAllTexture);
@@ -285,7 +291,7 @@ namespace SD3DDraw
             RenderTexture.active = addMaskTexture;
             GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
             var pixels = GeneratedTexture.GetPixels32();
-            for (int loop = 0; loop < SHRINK_PIXELS; loop++)
+            for (int loop = 0; loop < RemovalPixels; loop++)
             {
                 var newPixels = pixels.ToArray();
                 for (int x = 1; x < GeneratedTexture.width - 1; x++)
@@ -313,19 +319,30 @@ namespace SD3DDraw
             Graphics.Blit(sdOutputTexture_, RenderTexture.active, reflectMaskMaterial_);
             GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
             pixels = GeneratedTexture.GetPixels32();
-            for (int loop = 0; loop < SHRINK_PIXELS; loop++)
+            for (int loop = 0; loop < RemovalPixels; loop++)
             {
                 var newPixels = pixels.ToArray();
                 for (int x = 1; x < GeneratedTexture.width - 1; x++)
                 {
                     for (int y = 1; y < GeneratedTexture.height - 1; y++)
                     {
-                        if (pixels[x + y * GeneratedTexture.width].a >= 255)
+                        if (pixels[x + y * GeneratedTexture.width].a > ALPHA_THRESHOLD)
                         {
+                            newPixels[x + y * GeneratedTexture.width].a = 255;
                             newPixels[(x + 1) + y * GeneratedTexture.width].a = 255;
                             newPixels[(x - 1) + y * GeneratedTexture.width].a = 255;
                             newPixels[x + (y + 1) * GeneratedTexture.width].a = 255;
                             newPixels[x + (y - 1) * GeneratedTexture.width].a = 255;
+                        }
+                    }
+                }
+                for (int x = 0; x < GeneratedTexture.width; x++)
+                {
+                    for (int y = 0; y < GeneratedTexture.height; y++)
+                    {
+                        if (newPixels[x + y * GeneratedTexture.width].a <= ALPHA_THRESHOLD)
+                        {
+                            newPixels[x + y * GeneratedTexture.width].a = 0;
                         }
                     }
                 }
@@ -335,11 +352,34 @@ namespace SD3DDraw
             GeneratedTexture.Apply();
             RenderTexture.ReleaseTemporary(RenderTexture.active);
 
+            var tempTex = RenderTexture.GetTemporary(GeneratedTexture.width, GeneratedTexture.height);
+            reflectMaskMaterial_.SetTexture("_MaskTex", maskTexture);
+            reflectMaskMaterial_.SetTexture("_AddMaskTex", null);
+            Graphics.Blit(GeneratedTexture, tempTex, reflectMaskMaterial_);
+            RenderTexture.active = tempTex;
+            GeneratedTexture.ReadPixels(new Rect(0, 0, GeneratedTexture.width, GeneratedTexture.height), 0, 0);
+            GeneratedTexture.Apply();
+            RenderTexture.active = null;
+            RenderTexture.ReleaseTemporary(tempTex);
+
+            if (maskTexture != null)
+            {
+                RenderTexture.ReleaseTemporary(maskTexture);
+            }
+
+#if UNITY_EDITOR
+            if (sdManager_.KeepSeedOnPlaying && EditorApplication.isPlaying)
+            {
+                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
+                Seed = info.seed;
+            }
+#else
             if (sdManager_.KeepSeedOnPlaying)
             {
                 var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
                 Seed = info.seed;
             }
+#endif
         }
     }
 }
