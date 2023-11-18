@@ -6,4 +6,5 @@
 /sd3DDraw/Temp/
 /sd3DDraw/*.csproj
 /sd3DDraw/result_*.png
+/sd3DDraw/result_*.psd
 /sd3DDraw/Packages/online.mumeigames.RemoveBackground@0.1.0/

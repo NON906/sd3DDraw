@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace RemoveBackground
 {
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class RunModel : MonoBehaviour
     {
         public NNModel modelAsset;

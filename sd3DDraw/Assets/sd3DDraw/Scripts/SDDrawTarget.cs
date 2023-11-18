@@ -7,10 +7,13 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace SD3DDraw
 {
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class SDDrawTarget : MonoBehaviour
     {
         const string ADD_PROMPT = "simple background";
@@ -156,6 +159,10 @@ namespace SD3DDraw
 
             Hide(ChangeMaterials);
 
+#if UNITY_EDITOR
+            var window = EditorWindow.GetWindow(typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView"));
+            window.Show();
+#endif
             //sdManager_.CaptureCamera.Render();
             yield return new WaitForEndOfFrame();
 

@@ -5,10 +5,13 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace SD3DDraw
 {
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class SDManager : MonoBehaviour
     {
         const string API_URL = "http://127.0.0.1:7860";
@@ -35,7 +38,6 @@ namespace SD3DDraw
         public string SaveDirectory = "";
         public bool SavePngFile = true;
         public bool SavePsdFile = false;
-        //public bool KeepSeedOnPlaying = false;
 
         public SDBackGround TargetBackGround
         {
@@ -136,6 +138,10 @@ namespace SD3DDraw
                 CaptureCamera.backgroundColor = Color.clear;
             }
 
+#if UNITY_EDITOR
+            var window = EditorWindow.GetWindow(typeof(EditorWindow).Assembly.GetType("UnityEditor.GameView"));
+            window.Show();
+#endif
             yield return new WaitForEndOfFrame();
 
             Graphics.Blit(CaptureCamera.targetTexture, depthAllTexture_, getDepthMaterial_);
@@ -145,6 +151,9 @@ namespace SD3DDraw
             }
             var defaultMask = CaptureCamera.cullingMask;
             CaptureCamera.cullingMask = ~(1 << LayerMask.NameToLayer("SDTarget"));
+#if UNITY_EDITOR
+            window.Show();
+#endif
             //CaptureCamera.Render();
             yield return new WaitForEndOfFrame();
             Graphics.Blit(CaptureCamera.targetTexture, otherTexture_);

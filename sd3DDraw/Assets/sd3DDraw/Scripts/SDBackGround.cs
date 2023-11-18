@@ -72,7 +72,7 @@ namespace SD3DDraw
         public long seed;
     }
 
-    [ExecuteInEditMode]
+    //[ExecuteInEditMode]
     public class SDBackGround : MonoBehaviour
     {
         [TextArea(1, 10)]
