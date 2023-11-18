@@ -79,6 +79,7 @@ namespace SD3DDraw
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
+        public bool RandomSeed = true;
         public long Seed = -1;
 
         public Texture2D GeneratedTexture
@@ -106,7 +107,7 @@ namespace SD3DDraw
             var request = new Txt2ImgRequest();
             request.prompt = sdManager_.DefaultPrompt + ", " + Prompt;
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
-            request.seed = Seed;
+            request.seed = RandomSeed ? -1 : Seed;
             request.width = sdManager_.CaptureSize.x;
             request.height = sdManager_.CaptureSize.y;
             request.enable_hr = sdManager_.HiresFixScale > 1.001f;
@@ -135,11 +136,8 @@ namespace SD3DDraw
             var responseString = webRequest.downloadHandler.text;
             var response = JsonUtility.FromJson<Txt2ImgResponse>(responseString);
 
-            if (sdManager_.KeepSeedOnPlaying)
-            {
-                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
-                Seed = info.seed;
-            }
+            var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
+            Seed = info.seed;
 
             string baseImageOnBase64 = response.images[0];
             byte[] baseImage = Convert.FromBase64String(response.images[0]);

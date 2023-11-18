@@ -5,9 +5,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -30,6 +27,7 @@ namespace SD3DDraw
         public string Prompt = "";
         [TextArea(1, 10)]
         public string NegativePrompt = "";
+        public bool RandomSeed = true;
         public long Seed = -1;
         [Range(0f, 2f)]
         public float DepthWeight = 1f;
@@ -200,7 +198,7 @@ namespace SD3DDraw
                 request.prompt = sdManager_.DefaultPrompt + ", " + ADD_PROMPT + ", " + Prompt;
             }
             request.negative_prompt = sdManager_.DefaultNegativePrompt + ", " + NegativePrompt;
-            request.seed = Seed;
+            request.seed = RandomSeed ? -1 : Seed;
             request.width = sdManager_.CaptureSize.x;
             request.height = sdManager_.CaptureSize.y;
             request.enable_hr = sdManager_.HiresFixScale > 1.001f;
@@ -367,19 +365,8 @@ namespace SD3DDraw
                 RenderTexture.ReleaseTemporary(maskTexture);
             }
 
-#if UNITY_EDITOR
-            if (sdManager_.KeepSeedOnPlaying && EditorApplication.isPlaying)
-            {
-                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
-                Seed = info.seed;
-            }
-#else
-            if (sdManager_.KeepSeedOnPlaying)
-            {
-                var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
-                Seed = info.seed;
-            }
-#endif
+            var info = JsonUtility.FromJson<Txt2ImgResponseInfo>(response.info);
+            Seed = info.seed;
         }
     }
 }

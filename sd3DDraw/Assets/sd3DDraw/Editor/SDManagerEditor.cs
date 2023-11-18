@@ -29,7 +29,7 @@ namespace SD3DDraw
             sdManager.HiresFixUpscaler = EditorGUILayout.TextField("Hires Fix Upscaler", sdManager.HiresFixUpscaler);
             sdManager.DenoisingStrength = EditorGUILayout.Slider("Denoising Strength", sdManager.DenoisingStrength, 0f, 1f);
             EditorGUI.EndDisabledGroup();
-            sdManager.KeepSeedOnPlaying = EditorGUILayout.Toggle("Keep Seed On Playing", sdManager.KeepSeedOnPlaying);
+            //sdManager.KeepSeedOnPlaying = EditorGUILayout.Toggle("Keep Seed On Playing", sdManager.KeepSeedOnPlaying);
             sdManager.CaptureCamera = (Camera)EditorGUILayout.ObjectField("Capture Camera", sdManager.CaptureCamera, typeof(Camera), true);
             sdManager.GenerateOnStart = EditorGUILayout.Toggle("Generate On Start", sdManager.GenerateOnStart);
             sdManager.SaveDirectory = EditorGUILayout.TextField("Save Directory", sdManager.SaveDirectory);

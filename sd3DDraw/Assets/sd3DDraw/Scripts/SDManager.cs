@@ -35,7 +35,7 @@ namespace SD3DDraw
         public string SaveDirectory = "";
         public bool SavePngFile = true;
         public bool SavePsdFile = false;
-        public bool KeepSeedOnPlaying = false;
+        //public bool KeepSeedOnPlaying = false;
 
         public SDBackGround TargetBackGround
         {
