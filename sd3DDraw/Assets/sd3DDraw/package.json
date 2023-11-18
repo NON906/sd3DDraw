@@ -13,10 +13,6 @@
     "changelogUrl": "",
     "documentationUrl": "",
     "dependencies": {
-        "com.unity.barracuda": "3.0.0",
-        "com.vrmc.gltf": "https://github.com/vrm-c/UniVRM.git?path=/Assets/UniGLTF#v0.113.0",
-        "com.vrmc.univrm": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRM#v0.113.0",
-        "com.vrmc.vrm": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRM10#v0.113.0",
-        "com.vrmc.vrmshaders": "https://github.com/vrm-c/UniVRM.git?path=/Assets/VRMShaders#v0.113.0"
+        "com.unity.barracuda": "3.0.0"
     }
 }
