@@ -251,11 +251,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prompt: solo, 1girl
   NegativePrompt: 
+  RandomSeed: 1
   Seed: -1
   DepthWeight: 1
   DepthControlMode: 1
   NormalWeight: 1
   NormalControlMode: 1
+  OpenPoseWeight: 1
+  OpenPoseControlMode: 1
+  OpenPosePrefab: {fileID: 7537687334657514712, guid: baeec87881007ce4caaf9ca2af9e6ca0, type: 3}
   LineartWeight: 0
   LineartControlMode: 1
   ReferenceTexture: {fileID: 0}
@@ -263,6 +267,7 @@ MonoBehaviour:
   ReferenceControlMode: 2
   ChangeMaterials: 1
   DisableBackgroundMask: 0
+  RemovalPixels: 8
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -472,6 +477,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prompt: forest
   NegativePrompt: 
+  RandomSeed: 1
   Seed: -1
 --- !u!4 &1733531248
 Transform:

@@ -3,7 +3,9 @@ guid: 87462150a808e0e44b91fda258132021
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - OpenPosePrefab: {fileID: 7537687334657514712, guid: baeec87881007ce4caaf9ca2af9e6ca0, type: 3}
+  - ReferenceTexture: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

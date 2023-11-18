@@ -39,6 +39,10 @@ namespace SD3DDraw
         public float NormalWeight = 1f;
         public ControlModeEnum NormalControlMode = ControlModeEnum.MyPrompt;
         [Range(0f, 2f)]
+        public float OpenPoseWeight = 1f;
+        public ControlModeEnum OpenPoseControlMode = ControlModeEnum.MyPrompt;
+        public GameObject OpenPosePrefab;
+        [Range(0f, 2f)]
         public float LineartWeight = 0f;
         public ControlModeEnum LineartControlMode = ControlModeEnum.MyPrompt;
         public Texture2D ReferenceTexture = null;
@@ -63,6 +67,7 @@ namespace SD3DDraw
         Material maskMaterial_;
         Material reflectMaskMaterial_;
         Texture2D imageTexture_;
+        Texture2D openPoseTexture_;
         Texture2D sdOutputTexture_;
         RunModel runModel_;
         Renderer[] renderers_ = null;
@@ -90,6 +95,7 @@ namespace SD3DDraw
             depthTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
             normalTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
             imageTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
+            openPoseTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
             sdOutputTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
         }
 
@@ -193,6 +199,49 @@ namespace SD3DDraw
 
             Show();
 
+            var targetModelAnim = GetComponentInChildren<Animator>();
+            if (OpenPoseWeight > 0.001f && targetModelAnim != null)
+            {
+                var captureCameraClearFlags = sdManager_.CaptureCamera.clearFlags;
+                var captureCameraBackgroundColor = sdManager_.CaptureCamera.backgroundColor;
+                sdManager_.CaptureCamera.clearFlags = CameraClearFlags.SolidColor;
+                sdManager_.CaptureCamera.backgroundColor = Color.black;
+
+                var modelObj = Instantiate(OpenPosePrefab);
+                var modelRenderers = modelObj.GetComponentsInChildren<Renderer>();
+                foreach (var renderer in modelRenderers)
+                {
+                    renderer.gameObject.layer = LayerMask.NameToLayer("SDTarget");
+                }
+                var modelAnim = modelObj.GetComponentInChildren<Animator>();
+                for (HumanBodyBones bone = 0; bone < HumanBodyBones.LastBone; bone++)
+                {
+                    if (modelAnim.GetBoneTransform(bone) != null && targetModelAnim.GetBoneTransform(bone) != null)
+                    {
+                        modelAnim.GetBoneTransform(bone).position = targetModelAnim.GetBoneTransform(bone).position;
+                    }
+                }
+
+#if UNITY_EDITOR
+                window.Show();
+#endif
+                //sdManager_.CaptureCamera.Render();
+                yield return new WaitForEndOfFrame();
+
+                RenderTexture.active = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
+                Graphics.Blit(sdManager_.CaptureCamera.targetTexture, RenderTexture.active);
+                openPoseTexture_.ReadPixels(new Rect(0, 0, openPoseTexture_.width, openPoseTexture_.height), 0, 0);
+                openPoseTexture_.Apply();
+                RenderTexture.ReleaseTemporary(RenderTexture.active);
+                //byte[] bytes = openPoseTexture_.EncodeToPNG();
+                //File.WriteAllBytes(@"openpose.png", bytes);
+
+                Destroy(modelObj);
+
+                sdManager_.CaptureCamera.clearFlags = captureCameraClearFlags;
+                sdManager_.CaptureCamera.backgroundColor = captureCameraBackgroundColor;
+            }
+
             sdManager_.CaptureCamera.cullingMask = defaultMask;
 
             var request = new Txt2ImgRequest();
@@ -232,6 +281,15 @@ namespace SD3DDraw
                 arg.image = Convert.ToBase64String(normalTexture_.EncodeToPNG());
                 arg.control_mode = (int)NormalControlMode;
                 arg.weight = NormalWeight;
+                args.Add(arg);
+            }
+            if (OpenPoseWeight > 0.001f && targetModelAnim != null)
+            {
+                var arg = new Txt2ImgRequestScriptsControlNetArgs();
+                arg.model = "openpose";
+                arg.image = Convert.ToBase64String(openPoseTexture_.EncodeToPNG());
+                arg.control_mode = (int)OpenPoseControlMode;
+                arg.weight = OpenPoseWeight;
                 args.Add(arg);
             }
             if (LineartWeight > 0.001f)
