@@ -49,14 +49,12 @@ namespace RemoveBackground
             var channelCount = 3;
             var input = new Tensor(inputTexture, channelCount);
 
-            if (ModelAsset == null)
+            if (modelAsset == null)
             {
-                ModelAsset = Resources.Load<NNModel>("Models/isnet-anime");
+                modelAsset = Resources.Load<NNModel>("Models/isnet-anime");
             }
-            else
-            {
-                changeModelAsset();
-            }
+            changeModelAsset();
+            
             worker_.Execute(input);
 
             Tensor output = worker_.PeekOutput("mask");

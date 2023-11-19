@@ -51,7 +51,7 @@ Shader "Hidden/SD3DDraw/CalcMask"
             {
                 float coltarget = tex2D(_MainTex, i.uv).x;
                 float colall = tex2D(_AllTex, i.uvall).x;
-                float addmask = step(0.01, colall - coltarget) * step(0.01, coltarget);
+                float addmask = step(0.001, colall - coltarget) * step(0.0001, coltarget);
                 float retval = 1 - addmask;
                 
                 return fixed4(retval, retval, retval, 1);
