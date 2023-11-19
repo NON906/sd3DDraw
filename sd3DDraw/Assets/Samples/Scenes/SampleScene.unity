@@ -257,7 +257,7 @@ MonoBehaviour:
   DepthControlMode: 1
   NormalWeight: 1
   NormalControlMode: 1
-  OpenPoseWeight: 1
+  OpenPoseWeight: 0
   OpenPoseControlMode: 1
   OpenPosePrefab: {fileID: 7537687334657514712, guid: baeec87881007ce4caaf9ca2af9e6ca0, type: 3}
   LineartWeight: 0

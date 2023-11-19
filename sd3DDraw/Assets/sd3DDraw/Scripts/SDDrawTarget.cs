@@ -85,8 +85,6 @@ namespace SD3DDraw
         void Start()
         {
             sdManager_ = FindObjectOfType<SDManager>();
-
-            runModel_ = FindObjectOfType<RunModel>();
         }
 
         void init()
@@ -97,6 +95,8 @@ namespace SD3DDraw
             imageTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
             openPoseTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
             sdOutputTexture_ = new Texture2D(sdManager_.Width, sdManager_.Height);
+
+            runModel_ = FindObjectOfType<RunModel>();
         }
 
         public void Hide(bool changeMaterials = false)
