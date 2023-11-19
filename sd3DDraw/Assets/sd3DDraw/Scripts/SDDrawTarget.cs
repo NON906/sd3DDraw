@@ -39,7 +39,7 @@ namespace SD3DDraw
         public float NormalWeight = 1f;
         public ControlModeEnum NormalControlMode = ControlModeEnum.MyPrompt;
         [Range(0f, 2f)]
-        public float OpenPoseWeight = 1f;
+        public float OpenPoseWeight = 0f;
         public ControlModeEnum OpenPoseControlMode = ControlModeEnum.MyPrompt;
         public GameObject OpenPosePrefab;
         [Range(0f, 2f)]
@@ -118,20 +118,20 @@ namespace SD3DDraw
                 renderers_[loop].gameObject.layer = LayerMask.NameToLayer("SDTarget");
                 if (changeMaterials)
                 {
-                    materials_.Add(renderers_[loop].sharedMaterials);
-                    var materials = new Material[renderers_[loop].sharedMaterials.Length];
-                    for (int loop2 = 0; loop2 < renderers_[loop].sharedMaterials.Length; loop2++)
+                    materials_.Add(renderers_[loop].materials);
+                    var materials = new Material[renderers_[loop].materials.Length];
+                    for (int loop2 = 0; loop2 < renderers_[loop].materials.Length; loop2++)
                     {
-                        if (renderers_[loop].sharedMaterials[loop2].color.a >= 0.001f)
+                        if (renderers_[loop].materials[loop2].color.a >= 0.001f)
                         {
                             materials[loop2] = new Material(Shader.Find("Standard"));
                         }
                         else
                         {
-                            materials[loop2] = renderers_[loop].sharedMaterials[loop2];
+                            materials[loop2] = renderers_[loop].materials[loop2];
                         }
                     }
-                    renderers_[loop].sharedMaterials = materials;
+                    renderers_[loop].materials = materials;
                 }
             }
         }
@@ -148,7 +148,7 @@ namespace SD3DDraw
                 renderers_[loop].gameObject.layer = defaultLayers_[loop];
                 if (materials_ != null)
                 {
-                    renderers_[loop].sharedMaterials = materials_[loop];
+                    renderers_[loop].materials = materials_[loop];
                 }
             }
             renderers_ = null;
@@ -200,7 +200,7 @@ namespace SD3DDraw
             Show();
 
             var targetModelAnim = GetComponentInChildren<Animator>();
-            if (OpenPoseWeight > 0.001f && targetModelAnim != null)
+            if (OpenPoseWeight > 0.001f && targetModelAnim != null && OpenPosePrefab != null)
             {
                 var captureCameraClearFlags = sdManager_.CaptureCamera.clearFlags;
                 var captureCameraBackgroundColor = sdManager_.CaptureCamera.backgroundColor;
@@ -283,7 +283,7 @@ namespace SD3DDraw
                 arg.weight = NormalWeight;
                 args.Add(arg);
             }
-            if (OpenPoseWeight > 0.001f && targetModelAnim != null)
+            if (OpenPoseWeight > 0.001f && targetModelAnim != null && OpenPosePrefab != null)
             {
                 var arg = new Txt2ImgRequestScriptsControlNetArgs();
                 arg.model = "openpose";
