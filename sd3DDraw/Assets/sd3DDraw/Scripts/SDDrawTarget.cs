@@ -51,6 +51,7 @@ namespace SD3DDraw
         public ControlModeEnum ReferenceControlMode = ControlModeEnum.ControlNet;
         public bool ChangeMaterials = true;
         public bool DisableBackgroundMask = false;
+        public bool UseAlphaInScene = false;
         public int RemovalPixels = 8;
 
         public Texture2D GeneratedTexture
@@ -69,6 +70,7 @@ namespace SD3DDraw
         Texture2D imageTexture_;
         Texture2D openPoseTexture_;
         Texture2D sdOutputTexture_;
+        Material alphaToMaskMaterial_;
         RunModel runModel_;
         Renderer[] renderers_ = null;
         List<Material[]> materials_ = null;
@@ -80,6 +82,7 @@ namespace SD3DDraw
             getNormalMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/GetNormal"));
             maskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/CalcMask"));
             reflectMaskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/ReflectMask"));
+            alphaToMaskMaterial_ = new Material(Shader.Find("Hidden/SD3DDraw/AlphaToMask"));
         }
 
         void Start()
@@ -186,7 +189,7 @@ namespace SD3DDraw
             //bytes = normalTexture_.EncodeToPNG();
             //File.WriteAllBytes(@"normal.png", bytes);
 
-            if (LineartWeight > 0.001f)
+            if (LineartWeight > 0.001f || UseAlphaInScene)
             {
                 Graphics.Blit(sdManager_.CaptureCamera.targetTexture, RenderTexture.active);
                 imageTexture_.ReadPixels(new Rect(0, 0, sdManager_.CaptureCamera.targetTexture.width, sdManager_.CaptureCamera.targetTexture.height), 0, 0);
@@ -343,9 +346,16 @@ namespace SD3DDraw
             RenderTexture maskTexture = null;
             if (!DisableBackgroundMask)
             {
-                var originalMaskTexture = runModel_.Execute(sdOutputTexture_);
                 maskTexture = RenderTexture.GetTemporary(sdOutputTexture_.width, sdOutputTexture_.height);
-                Graphics.Blit(originalMaskTexture, maskTexture);
+                if (UseAlphaInScene)
+                {
+                    Graphics.Blit(imageTexture_, maskTexture, alphaToMaskMaterial_);
+                }
+                else
+                {
+                    var originalMaskTexture = runModel_.Execute(sdOutputTexture_);
+                    Graphics.Blit(originalMaskTexture, maskTexture);
+                }
             }
             var addMaskTexture = RenderTexture.GetTemporary(sdManager_.Width, sdManager_.Height);
             maskMaterial_.SetTexture("_AllTex", depthAllTexture);
