@@ -9,9 +9,14 @@
         "email": "mumeigames@gmail.com"
     },
     "samples": [
+        {
+            "displayName": "Sample",
+            "description": "Sample Scene.",
+            "path": "../Samples"
+        }
     ],
-    "changelogUrl": "",
-    "documentationUrl": "",
+    "changelogUrl": "https://github.com/NON906/sd3DDraw/releases",
+    "documentationUrl": "https://github.com/NON906/sd3DDraw/blob/main/README.md",
     "dependencies": {
         "com.unity.barracuda": "3.0.0"
     }
