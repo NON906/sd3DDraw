@@ -1,7 +1,7 @@
 {
     "name": "online.mumeigames.sd3ddraw",
     "version": "0.1.0",
-    "description": "",
+    "description": "This is a Unity asset that allows you to convert each 3D object placed on the Unity editor into an illustration using the Stable Diffusion web UI.",
     "displayName": "SD_3DDrawCamera",
     "unity": "2021.3",
     "author": {
