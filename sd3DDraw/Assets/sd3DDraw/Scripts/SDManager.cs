@@ -111,7 +111,6 @@ namespace SD3DDraw
                 drawTarget.Target = target;
                 drawTargets_.Add(drawTarget);
             }
-            drawTargets_ = drawTargets_.OrderByDescending(item => item.Distance).ToList();
         }
 
         public void Generate()
@@ -167,10 +166,32 @@ namespace SD3DDraw
             {
                 yield return TargetBackGround.Generate();
             }
-            foreach (var drawTarget in drawTargets_)
+            drawTargets_ = drawTargets_.OrderBy(item => item.Distance).ToList();
+            for (int targetLoop = 0; targetLoop < drawTargets_.Count; targetLoop++)
             {
-                yield return drawTarget.Target.Generate(depthAllTexture_);
+                yield return drawTargets_[targetLoop].Target.Generate(depthAllTexture_);
+                if (targetLoop + 1 < drawTargets_.Count)
+                {
+                    for (int targetLoop2 = 0; targetLoop2 < targetLoop + 1; targetLoop2++)
+                    {
+                        drawTargets_[targetLoop2].Target.Hide();
+                    }
+                    defaultMask = CaptureCamera.cullingMask;
+                    CaptureCamera.cullingMask = ~(1 << LayerMask.NameToLayer("SDTarget"));
+#if UNITY_EDITOR
+                    window.Show();
+#endif
+                    //CaptureCamera.Render();
+                    yield return new WaitForEndOfFrame();
+                    Graphics.Blit(CaptureCamera.targetTexture, depthAllTexture_, getDepthMaterial_);
+                    CaptureCamera.cullingMask = defaultMask;
+                    for (int targetLoop2 = 0; targetLoop2 < targetLoop + 1; targetLoop2++)
+                    {
+                        drawTargets_[targetLoop2].Target.Show();
+                    }
+                }
             }
+            drawTargets_.Reverse();
 
             if (SavePngFile)
             {
