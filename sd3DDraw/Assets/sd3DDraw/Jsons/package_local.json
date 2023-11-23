@@ -1,7 +1,7 @@
 {
     "name": "online.mumeigames.removebackground",
     "version": "0.1.0",
-    "description": "",
+    "description": "Sub assets for SD_3DDrawCamera.",
     "displayName": "Remove Background",
     "unity": "2021.3",
     "author": {
