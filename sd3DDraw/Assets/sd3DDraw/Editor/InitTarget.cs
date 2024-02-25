@@ -93,7 +93,14 @@ namespace SD3DDraw
 
                 download("https://github.com/NON906/sd3DDraw/releases/download/ver0.1.0/isnet-anime.onnx", "Packages/online.mumeigames.RemoveBackground@0.1.0/Resources/Models/isnet-anime.onnx");
 
-                AssetDatabase.CopyAsset("Assets/sd3DDraw/Jsons/package_local.json", "Packages/online.mumeigames.RemoveBackground@0.1.0/package.json");
+                if (File.Exists("Assets/sd3DDraw/Jsons/package_local.json"))
+                {
+                    AssetDatabase.CopyAsset("Assets/sd3DDraw/Jsons/package_local.json", "Packages/online.mumeigames.RemoveBackground@0.1.0/package.json");
+                }
+                else
+                {
+                    AssetDatabase.CopyAsset("Packages/online.mumeigames.sd3ddraw/Jsons/package_local.json", "Packages/online.mumeigames.RemoveBackground@0.1.0/package.json");
+                }
                 AssetDatabase.Refresh();
             }
 
